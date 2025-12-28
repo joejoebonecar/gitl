@@ -3,1103 +3,730 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Mancala - Traditional Japanese Style</title>
-
-  <!-- Libraries (CDN) -->
+  <title>Zen Mancala</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-
+  
   <style>
-    :root{
-      color-scheme: light dark;
-      --bg: #f5f3ed;
-      --panel: rgba(250,248,243,.88);
-      --text: rgba(60,50,40,.92);
-      --muted: rgba(80,70,60,.72);
-      --accent: #c9967a;
-      --accent2:#8b7355;
-      --shadow: rgba(40,30,20,.28);
-      --border: rgba(100,80,60,.18);
+    :root {
+      --bg: #e6e2d3;
+      --ui-bg: rgba(255, 252, 245, 0.9);
+      --text: #4a4036;
+      --accent: #8c7b6c;
     }
-    html,body{ height:100%; margin:0; }
-    body{
-      font-family: 'Noto Serif JP', 'Georgia', serif;
-      background:
-        radial-gradient(1200px 700px at 25% 20%, rgba(201,150,122,.08), transparent 55%),
-        radial-gradient(1200px 700px at 75% 80%, rgba(139,115,85,.06), transparent 55%),
-        var(--bg);
-      color: var(--text);
-      overflow:hidden;
+    body { margin: 0; overflow: hidden; background: var(--bg); font-family: 'Georgia', serif; color: var(--text); }
+    
+    /* UI Overlay */
+    #ui {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+      display: flex; flex-direction: column; justify-content: space-between; padding: 20px; box-sizing: border-box;
     }
-    #app{ position:fixed; inset:0; display:grid; grid-template-rows:auto 1fr auto; gap:12px; padding:16px; }
-    .bar{
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px var(--shadow);
-      backdrop-filter: blur(8px);
-      display:flex; flex-wrap:wrap; gap:12px;
-      align-items:center; justify-content:space-between;
-      padding: 12px 16px;
+    .panel {
+      pointer-events: auto;
+      background: var(--ui-bg);
+      backdrop-filter: blur(10px);
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border: 1px solid rgba(0,0,0,0.05);
+      text-align: center;
+      transition: opacity 0.3s;
     }
-    .title{ display:flex; flex-direction:column; gap:3px; }
-    .title b{ font-size: 16px; letter-spacing:.03em; font-weight:600; }
-    .title span{ font-size: 13px; color: var(--muted); font-style:italic; }
-    .controls{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-    button{
-      border: 1px solid rgba(80,60,40,.22);
-      background: rgba(255,250,245,.55);
-      color: var(--text);
-      font: inherit;
-      padding: 10px 14px;
-      border-radius: 10px;
-      cursor:pointer;
-      transition: all .15s ease;
-      user-select:none;
-      font-weight:500;
+    h1 { margin: 0 0 5px 0; font-size: 1.4rem; letter-spacing: 0.05em; color: #2c241b; }
+    p { margin: 0; font-size: 0.9rem; color: #6b5d52; }
+    
+    /* HUD */
+    .hud { display: flex; gap: 20px; justify-content: center; font-weight: bold; font-size: 1.1rem; }
+    .turn-indicator { color: var(--accent); font-style: italic; font-size: 0.9rem; margin-top: 5px; }
+
+    /* Controls */
+    .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+    button {
+      background: #f0ebe0; border: 1px solid #dcd6cb; padding: 8px 16px; border-radius: 6px;
+      color: #5c4d3c; cursor: pointer; font-family: inherit; font-weight: 600;
+      transition: all 0.2s ease;
     }
-    button:hover{ transform: translateY(-1px); background: rgba(255,250,245,.78); border-color: rgba(80,60,40,.35); box-shadow:0 2px 8px var(--shadow); }
-    button:active{ transform: translateY(0px); }
-    button.tog.on{ border-color: var(--accent); background:rgba(201,150,122,.12); }
-    button.tog.off{ opacity:.65; }
-    #stage{
-      position:relative;
-      border-radius: 20px;
-      overflow:hidden;
-      border: 1px solid var(--border);
-      background: rgba(245,240,235,.35);
-      box-shadow: inset 0 2px 12px rgba(40,30,20,.08), 0 12px 48px var(--shadow);
-      min-height: 400px;
+    button:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    button:active { transform: translateY(0); }
+    
+    /* Start Screen / Modal */
+    #modal {
+      position: fixed; inset: 0; background: rgba(230, 226, 211, 0.85); z-index: 10;
+      display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);
     }
-    #canvas3d{ width:100%; height:100%; display:block; }
-    .hud{
-      font-size: 14px;
-      display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center;
-      padding: 12px 16px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px var(--shadow);
-      backdrop-filter: blur(8px);
+    .card {
+      background: #fffcf5; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15); text-align: center; border: 1px solid #e0d8c8;
     }
-    .pill{
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(80,60,40,.16);
-      background: rgba(255,250,245,.45);
-      color: var(--text);
-      font-weight:500;
-    }
-    .overlay{
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      padding: 20px;
-      background: radial-gradient(900px 600px at 50% 40%, rgba(245,240,235,.75), rgba(230,220,205,.92));
-      backdrop-filter:blur(6px);
-      z-index:100;
-    }
-    .card{
-      width:min(760px, 100%);
-      background: rgba(250,248,243,.95);
-      border: 2px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 16px 64px rgba(40,30,20,.18);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .card h1{ margin:0 0 12px; font-size: 22px; font-weight:600; color:var(--accent2); }
-    .card h2{ margin:16px 0 10px; font-size:16px; color:var(--accent2); }
-    .card p{ margin:0 0 14px; line-height:1.6; color: var(--muted); }
-    .row{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
-    .kbd{
-      display:inline-block; padding:3px 8px; border-radius: 6px;
-      border: 1px solid rgba(80,60,40,.2);
-      background: rgba(255,250,245,.6);
-      font-size: 13px; color: var(--text); font-weight:600;
-    }
-    .warn{ color: rgba(160,80,60,.92); }
-    @media (max-width:768px){
-      #app{ gap:8px; padding:12px; }
-      .bar{ padding:10px 12px; }
-      .controls{ gap:6px; }
-      button{ padding:8px 10px; font-size:13px; }
-      .card{ padding:16px; }
-      .card h1{ font-size:18px; }
-    }
+    .card h2 { margin-top: 0; color: #8b5e3c; }
+    .mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+    .card hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+    
+    canvas { display: block; outline: none; }
+    
+    /* Fade transition */
+    .hidden { opacity: 0; pointer-events: none; }
   </style>
 </head>
-
 <body>
-  <div id="app">
-    <div class="bar">
-      <div class="title">
-        <b>伝統的なマンカラ</b>
-        <span>Traditional Japanese Mancala</span>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="ui">
+    <div class="panel">
+      <h1>ZEN MANCALA</h1>
+      <div class="hud">
+        <span id="p2-score">CPU: 0</span>
+        <span id="p1-score">You: 0</span>
       </div>
+      <div id="status" class="turn-indicator">Initialize...</div>
+    </div>
+
+    <div class="panel" style="align-self: center; margin-bottom: 20px;">
       <div class="controls">
-        <button id="new">New Game</button>
-        <button id="undo">Undo</button>
-        <button id="hint">Hint</button>
-        <button id="sound" class="tog on">Sound: ON</button>
-        <button id="fs">Fullscreen</button>
+        <button id="btn-undo">Undo</button>
+        <button id="btn-restart">Restart</button>
+        <button id="btn-sound">Sound: ON</button>
       </div>
     </div>
+  </div>
 
-    <div id="stage">
-      <canvas id="canvas3d"></canvas>
-
-      <div class="overlay" id="overlay">
-        <div class="card">
-          <h1>Welcome to Traditional Mancala 🪵🪨</h1>
-          <p>Pick a pit on <b>your</b> side (bottom row). Stones drop counter-clockwise, skipping opponent's store. Landing in your store grants an extra turn. Landing your last stone in an empty pit on your side captures the opposite stones.</p>
-          <p>Keys: <span class="kbd">N</span> new game • <span class="kbd">U</span> undo • <span class="kbd">F</span> fullscreen</p>
-          <p class="warn">Audio and fullscreen require user interaction (browser security).</p>
-          <div class="row">
-            <button id="play">2-Player Game</button>
-            <button id="playfs">2-Player Fullscreen</button>
-          </div>
-          <hr style="margin:16px 0; border:none; border-top:1px solid var(--border);">
-          <h2>Play vs AI</h2>
-          <p style="margin:0 0 10px; font-size:13px; color:var(--muted);">Select difficulty:</p>
-          <div class="row">
-            <button id="aiEasy">Easy</button>
-            <button id="aiMedium">Medium</button>
-            <button id="aiHard">Hard</button>
-            <button id="aiImpossible">Impossible</button>
-          </div>
-        </div>
+  <div id="modal">
+    <div class="card">
+      <h2>Welcome</h2>
+      <p>A meditative game of strategy.</p>
+      <hr>
+      <p><strong>Select Game Mode:</strong></p>
+      <div class="mode-select">
+        <button onclick="startGame('pvp')">2 Players</button>
+        <button onclick="startGame('cpu')">Vs CPU (Normal)</button>
       </div>
-    </div>
-
-    <div class="hud">
-      <div class="pill" id="status">Preparing board…</div>
-      <div class="pill" id="score">Player 1: 0 • Player 2: 0</div>
-      <div class="pill" id="note">Bottom row belongs to Player 1.</div>
+      <p style="font-size:0.8rem; margin-top:15px; color:#999">
+        Pick a pit on your side (Bottom). Stones move counter-clockwise.<br>
+        Land in your store for a free turn.
+      </p>
     </div>
   </div>
 
 <script>
-(() => {
-  // ======== Kalah board indices ========
-  const P1_PITS=[0,1,2,3,4,5], P2_PITS=[7,8,9,10,11,12];
-  const P1_STORE=6, P2_STORE=13;
-  const OPP = (i) => 12 - i;
+/**
+ * AUDIO ENGINE
+ * Uses Web Audio API to synthesize procedural wood/stone sounds.
+ * No external assets required.
+ */
+const AudioEngine = (() => {
+  let ctx = null;
+  let enabled = true;
 
-  // ======== State ========
-  let state, player, animating=false, gameOver=false;
-  let gameMode = '2player';
-  let aiDifficulty = 'medium';
-  let isAIPlayer = [false, false];
-  const history=[];
-
-  // ======== UI ========
-  const statusEl = document.getElementById('status');
-  const scoreEl  = document.getElementById('score');
-  const noteEl   = document.getElementById('note');
-  const overlay  = document.getElementById('overlay');
-  const btnNew   = document.getElementById('new');
-  const btnUndo  = document.getElementById('undo');
-  const btnHint  = document.getElementById('hint');
-  const btnFS    = document.getElementById('fs');
-  const btnSound = document.getElementById('sound');
-  const btnPlay  = document.getElementById('play');
-  const btnPlayFS= document.getElementById('playfs');
-  const btnAIEasy = document.getElementById('aiEasy');
-  const btnAIMedium = document.getElementById('aiMedium');
-  const btnAIHard = document.getElementById('aiHard');
-  const btnAIImpossible = document.getElementById('aiImpossible');
-
-  // ======== Enhanced Audio (Howler + Web Audio) ========
-  let soundOn=true;
-  let musicPlaying = false;
-
-  function initAudio(){
-    try{
-      if(Howler.ctx && !musicPlaying){
-        playJapaneseMusicAmbience();
-        musicPlaying = true;
-      }
-    }catch(_){}
-  }
-
-  function playJapaneseMusicAmbience(){
-    if(!soundOn || musicPlaying) return;
-    try{
-      const ctx = Howler.ctx;
-      if(!ctx) return;
-
-      // Create ambient Japanese-style background music using oscillators
-      // Pentatonic scale: D, E, G, A, B (natural minor pentatonic)
-      const notes = [146.83, 164.81, 196.00, 220.00, 246.94]; // D4, E4, G4, A4, B4
-      const duration = 8;
-      const t0 = ctx.currentTime;
-
-      // Main melody line (slower, sustaining notes)
-      const melody = [
-        {freq: 220, start: t0, dur: 2},    // A4
-        {freq: 196, start: t0+2, dur: 1.5}, // G4
-        {freq: 164.81, start: t0+3.5, dur: 1.5}, // E4
-        {freq: 196, start: t0+5, dur: 1},  // G4
-        {freq: 220, start: t0+6, dur: 2}   // A4
-      ];
-
-      // Low harmonic pad
-      const padFreq = 110; // A3
-      const padGain = ctx.createGain();
-      const padOsc = ctx.createOscillator();
-      padOsc.type = 'sine';
-      padOsc.frequency.setValueAtTime(padFreq, t0);
-      padGain.gain.setValueAtTime(0, t0);
-      padGain.gain.linearRampToValueAtTime(0.08, t0+0.5);
-      padGain.gain.setValueAtTime(0.08, t0+duration-0.5);
-      padGain.gain.linearRampToValueAtTime(0, t0+duration);
-      padOsc.connect(padGain);
-      padGain.connect(Howler.masterGain);
-      padOsc.start(t0);
-      padOsc.stop(t0+duration);
-
-      // Melody voices
-      for(const note of melody){
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(note.freq, note.start);
-        gain.gain.setValueAtTime(0, note.start);
-        gain.gain.linearRampToValueAtTime(0.06, note.start+0.1);
-        gain.gain.setValueAtTime(0.06, note.start+note.dur-0.15);
-        gain.gain.linearRampToValueAtTime(0, note.start+note.dur);
-        osc.connect(gain);
-        gain.connect(Howler.masterGain);
-        osc.start(note.start);
-        osc.stop(note.start+note.dur);
-      }
-
-      // Loop music
-      setTimeout(()=>{ if(soundOn && !gameOver) playJapaneseMusicAmbience(); }, duration*1000);
-    }catch(_){}
-  }
-
-  function stoneDrop(){
-    if(!soundOn) return;
-    try{
-      const ctx = Howler.ctx;
-      if(!ctx) return;
-      const t0 = ctx.currentTime;
-
-      // Rich stone drop with multiple harmonics
-      const baseFreq = 180 + Math.random()*80;
-      
-      // Primary tone
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.type = 'triangle';
-      osc1.frequency.exponentialRampToValueAtTime(baseFreq*0.6, t0+0.12);
-      osc1.frequency.setValueAtTime(baseFreq, t0);
-      gain1.gain.setValueAtTime(0.05, t0);
-      gain1.gain.exponentialRampToValueAtTime(0.0001, t0+0.12);
-      osc1.connect(gain1);
-      gain1.connect(Howler.masterGain);
-      osc1.start(t0);
-      osc1.stop(t0+0.12);
-
-      // Harmonic overtone
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(baseFreq*1.5, t0);
-      osc2.frequency.exponentialRampToValueAtTime(baseFreq*0.8, t0+0.08);
-      gain2.gain.setValueAtTime(0.015, t0);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, t0+0.08);
-      osc2.connect(gain2);
-      gain2.connect(Howler.masterGain);
-      osc2.start(t0);
-      osc2.stop(t0+0.08);
-    }catch(_){}
-  }
-
-  function captureSound(){
-    if(!soundOn) return;
-    try{
-      const ctx = Howler.ctx;
-      if(!ctx) return;
-      const t0 = ctx.currentTime;
-
-      // Ascending chime for capture
-      const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
-      for(let i=0; i<freqs.length; i++){
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freqs[i], t0+i*0.08);
-        gain.gain.setValueAtTime(0, t0+i*0.08);
-        gain.gain.linearRampToValueAtTime(0.04, t0+i*0.08+0.05);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t0+i*0.08+0.15);
-        osc.connect(gain);
-        gain.connect(Howler.masterGain);
-        osc.start(t0+i*0.08);
-        osc.stop(t0+i*0.08+0.15);
-      }
-    }catch(_){}
-  }
-
-  function extraTurnSound(){
-    if(!soundOn) return;
-    try{
-      const ctx = Howler.ctx;
-      if(!ctx) return;
-      const t0 = ctx.currentTime;
-
-      // Double chime for extra turn
-      for(let j=0; j<2; j++){
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, t0+j*0.2);
-        gain.gain.setValueAtTime(0, t0+j*0.2);
-        gain.gain.linearRampToValueAtTime(0.045, t0+j*0.2+0.08);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t0+j*0.2+0.18);
-        osc.connect(gain);
-        gain.connect(Howler.masterGain);
-        osc.start(t0+j*0.2);
-        osc.stop(t0+j*0.2+0.18);
-      }
-    }catch(_){}
-  }
-
-  btnSound.addEventListener('click', () => {
-    soundOn = !soundOn;
-    btnSound.textContent = `Sound: ${soundOn ? "ON" : "OFF"}`;
-    btnSound.classList.toggle("on", soundOn);
-    btnSound.classList.toggle("off", !soundOn);
-    if(soundOn){ extraTurnSound(); initAudio(); }
-  });
-
-  // ======== Fullscreen ========
-  async function goFullscreen(){
-    const el = document.documentElement;
-    try{
-      if(el.requestFullscreen) await el.requestFullscreen();
-      else if(el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
-    }catch(_){}
-  }
-  btnFS.addEventListener('click', () => goFullscreen());
-
-  // ======== Three.js setup ========
-  const canvas = document.getElementById('canvas3d');
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf5f3ed);
-  scene.fog = new THREE.Fog(0xf5f3ed, 20, 60);
-
-  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
-  camera.position.set(0, 13, 18);
-  camera.lookAt(0, 0, 0);
-
-  scene.add(new THREE.AmbientLight(0xfff8f0, 0.65));
-  scene.add(new THREE.HemisphereLight(0xfff5e8, 0xe8dcc8, 0.5));
-
-  const key = new THREE.DirectionalLight(0xfff8f0, 0.7);
-  key.position.set(6, 12, 7);
-  key.castShadow = true;
-  key.shadow.mapSize.set(2048,2048);
-  key.shadow.camera.left = -15;
-  key.shadow.camera.right = 15;
-  key.shadow.camera.top = 15;
-  key.shadow.camera.bottom = -15;
-  key.shadow.camera.near = 0.5;
-  key.shadow.camera.far = 45;
-  key.shadow.bias = -0.0003;
-  scene.add(key);
-
-  const fill = new THREE.DirectionalLight(0xe8dcc8, 0.3);
-  fill.position.set(-5, 6, -5);
-  scene.add(fill);
-
-  const floorGeo = new THREE.PlaneGeometry(80, 80);
-  const floorMat = new THREE.MeshStandardMaterial({ 
-    color:0xe8dcc8, 
-    roughness:0.92, 
-    metalness:0,
-    map: createTatamiTexture()
-  });
-  const floor = new THREE.Mesh(floorGeo, floorMat);
-  floor.rotation.x = -Math.PI/2;
-  floor.position.y = -1.8;
-  floor.receiveShadow = true;
-  scene.add(floor);
-
-  function createTatamiTexture(){
-    const size = 512;
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = size;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#e8dcc8';
-    ctx.fillRect(0, 0, size, size);
-    ctx.strokeStyle = 'rgba(200,180,150,0.3)';
-    ctx.lineWidth = 1;
-    for(let i=0; i<size; i+=3){
-      ctx.beginPath();
-      ctx.moveTo(0, i);
-      ctx.lineTo(size, i);
-      ctx.stroke();
+  function init() {
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
     }
-    const tex = new THREE.Texture(canvas);
-    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(8, 8);
-    tex.needsUpdate = true;
-    return tex;
+    if (ctx.state === 'suspended') ctx.resume();
   }
 
-  function createWoodGrainTexture(baseColor='#c9967a'){
-    const size = 512;
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = size;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = baseColor;
-    ctx.fillRect(0, 0, size, size);
-    ctx.strokeStyle = 'rgba(100,70,50,0.15)';
-    ctx.lineWidth = 1.5;
-    for(let i=0; i<40; i++){
-      ctx.beginPath();
-      const y = (i/40) * size + Math.sin(i*0.3)*8;
-      ctx.moveTo(0, y);
-      for(let x=0; x<size; x+=10){
-        const offset = Math.sin((x+i*20)*0.02)*3;
-        ctx.lineTo(x, y + offset);
-      }
-      ctx.stroke();
-    }
-    for(let i=0; i<8; i++){
-      const x = Math.random()*size;
-      const y = Math.random()*size;
-      const gradient = ctx.createRadialGradient(x,y,0, x,y,12);
-      gradient.addColorStop(0, 'rgba(80,60,40,0.15)');
-      gradient.addColorStop(1, 'rgba(80,60,40,0)');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(x-12, y-12, 24, 24);
-    }
-    const tex = new THREE.Texture(canvas);
-    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.needsUpdate = true;
-    return tex;
-  }
-
-  const boardGroup = new THREE.Group();
-  scene.add(boardGroup);
-
-  const woodTex = createWoodGrainTexture('#c9967a');
-  const darkWoodTex = createWoodGrainTexture('#8b7355');
-
-  const boardMat = new THREE.MeshStandardMaterial({
-    color: 0xc9967a,
-    roughness: 0.72,
-    metalness: 0.02,
-    map: woodTex
-  });
-
-  const board = new THREE.Mesh(
-    new THREE.BoxGeometry(17, 1.6, 7.2),
-    boardMat
-  );
-  board.castShadow = true;
-  board.receiveShadow = true;
-  board.position.y = -0.5;
-  boardGroup.add(board);
-
-  const rimMat = new THREE.MeshStandardMaterial({ 
-    color:0x8b7355, 
-    roughness:0.78, 
-    metalness:0.02,
-    map: darkWoodTex
-  });
-  const rim = new THREE.Mesh(
-    new THREE.BoxGeometry(17.6, 0.4, 7.7),
-    rimMat
-  );
-  rim.position.y = 0.25;
-  rim.castShadow = true;
-  rim.receiveShadow = true;
-  boardGroup.add(rim);
-
-  const pitMeshes = new Map();
-  const stoneGroups = new Map();
-  const labelSprites = new Map();
-  const clickable = [];
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
-
-  function pitPos(index){
-    if(index === P2_STORE) return { x:-8.8, z:0, isStore:true };
-    if(index === P1_STORE) return { x: 8.8, z:0, isStore:true };
-    if(index >= 7 && index <= 12){
-      const col = 12 - index;
-      return { x: -6.0 + col*2.4, z: -2.0, isStore:false };
-    }
-    if(index >= 0 && index <= 5){
-      const col = index;
-      return { x: -6.0 + col*2.4, z:  2.0, isStore:false };
-    }
-    return { x:0, z:0, isStore:false };
-  }
-
-  const pitMat = new THREE.MeshStandardMaterial({ 
-    color:0x6b5a47, 
-    roughness:0.88, 
-    metalness:0.0 
-  });
-  const pitRimMat = new THREE.MeshStandardMaterial({ 
-    color:0x8b7355, 
-    roughness:0.75, 
-    metalness:0.02,
-    map: darkWoodTex
-  });
-
-  function createTextSprite(text){
-    const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'rgba(245,240,235,0.9)';
-    ctx.fillRect(0, 0, 128, 128);
-    ctx.font = 'bold 72px Georgia, serif';
-    ctx.fillStyle = '#5a4a3a';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(text, 64, 64);
-    const tex = new THREE.Texture(canvas);
-    tex.needsUpdate = true;
-    const mat = new THREE.SpriteMaterial({ map:tex, transparent:true });
-    const sprite = new THREE.Sprite(mat);
-    sprite.scale.set(0.8, 0.8, 1);
-    return sprite;
-  }
-
-  function createPit(index){
-    const p = pitPos(index);
-    const isStore = p.isStore;
-
-    const g = new THREE.Group();
-    g.position.set(p.x, 0.0, p.z);
-
-    const rimGeo = isStore 
-      ? new THREE.CylinderGeometry(1.35, 1.45, 0.5, 48) 
-      : new THREE.CylinderGeometry(1.0, 1.1, 0.45, 48);
-    const bowlGeo = isStore 
-      ? new THREE.CylinderGeometry(1.22, 1.32, 0.6, 48) 
-      : new THREE.CylinderGeometry(0.88, 0.98, 0.55, 48);
-
-    const rim = new THREE.Mesh(rimGeo, pitRimMat);
-    rim.castShadow = true;
-    rim.receiveShadow = true;
-    rim.position.y = 0.32;
-    g.add(rim);
-
-    const bowl = new THREE.Mesh(bowlGeo, pitMat);
-    bowl.castShadow = true;
-    bowl.receiveShadow = true;
-    bowl.position.y = 0.08;
-    g.add(bowl);
-
-    const hit = new THREE.Mesh(
-      new THREE.CylinderGeometry(isStore ? 1.3 : 1.0, isStore ? 1.3 : 1.0, 0.2, 32),
-      new THREE.MeshBasicMaterial({ transparent:true, opacity:0 })
-    );
-    hit.position.y = 0.6;
-    hit.userData = { type:"pit", index };
-    g.add(hit);
-
-    const sg = new THREE.Group();
-    sg.position.y = 0.4;
-    g.add(sg);
-
-    const label = createTextSprite('0');
-    label.position.y = 1.4;
-    g.add(label);
-
-    pitMeshes.set(index, g);
-    stoneGroups.set(index, sg);
-    labelSprites.set(index, label);
-    clickable.push(hit);
-
-    boardGroup.add(g);
-  }
-
-  for(let i=0;i<14;i++){
-    if(i===P1_STORE || i===P2_STORE || (i>=0 && i<=5) || (i>=7 && i<=12)) createPit(i);
-  }
-
-  const stoneGeo = new THREE.SphereGeometry(0.16, 20, 20);
-  const stoneMats = [
-    new THREE.MeshStandardMaterial({ color:0xf5f3ed, roughness:0.42, metalness:0.06 }),
-    new THREE.MeshStandardMaterial({ color:0xe8dcc8, roughness:0.40, metalness:0.06 }),
-    new THREE.MeshStandardMaterial({ color:0xfff8f0, roughness:0.44, metalness:0.05 }),
-    new THREE.MeshStandardMaterial({ color:0xebe0d0, roughness:0.41, metalness:0.06 }),
-    new THREE.MeshStandardMaterial({ color:0xf2ebe0, roughness:0.43, metalness:0.05 }),
-    new THREE.MeshStandardMaterial({ color:0xfaf5eb, roughness:0.39, metalness:0.07 }),
-  ];
-
-  function arrangeStones(count, radius){
-    const pts=[];
-    if(count <= 6){
-      for(let i=0;i<count;i++){
-        const a = (i / count) * Math.PI * 2;
-        const r = radius * 0.5;
-        pts.push({ x: Math.cos(a)*r, z: Math.sin(a)*r, y:0 });
-      }
-    } else if(count <= 14){
-      const inner = Math.min(6, count-6);
-      const outer = count - inner;
-      for(let i=0;i<inner;i++){
-        const a = (i / inner) * Math.PI * 2;
-        const r = radius * 0.35;
-        pts.push({ x: Math.cos(a)*r, z: Math.sin(a)*r, y:0.15 });
-      }
-      for(let i=0;i<outer;i++){
-        const a = (i / outer) * Math.PI * 2;
-        const r = radius * 0.75;
-        pts.push({ x: Math.cos(a)*r, z: Math.sin(a)*r, y:0 });
-      }
-    } else {
-      const layers = Math.ceil(count / 10);
-      let placed = 0;
-      for(let layer=0; layer<layers && placed<count; layer++){
-        const inThisLayer = Math.min(10, count - placed);
-        const r = radius * (0.3 + layer*0.25);
-        for(let i=0; i<inThisLayer; i++){
-          const a = (i / inThisLayer) * Math.PI * 2 + layer*0.5;
-          pts.push({ 
-            x: Math.cos(a)*r, 
-            z: Math.sin(a)*r, 
-            y: layer*0.18
-          });
-          placed++;
-        }
-      }
-    }
-    return pts;
-  }
-
-  function refreshStones(){
-    for(const [idx, sg] of stoneGroups.entries()){
-      while(sg.children.length) sg.remove(sg.children[0]);
-
-      const n = state[idx];
-      const isStore = (idx===P1_STORE || idx===P2_STORE);
-      const radius = isStore ? 1.05 : 0.72;
-      const pts = arrangeStones(n, radius);
-
-      for(let i=0;i<n;i++){
-        const pos = pts[i] || {x:0, z:0, y:0};
-        const m = new THREE.Mesh(stoneGeo, stoneMats[(i + idx*3) % stoneMats.length]);
-        m.castShadow = true;
-        m.receiveShadow = true;
-        m.position.set(pos.x, pos.y + Math.random()*0.05, pos.z);
-        sg.add(m);
-      }
-
-      if(labelSprites.has(idx)){
-        const label = labelSprites.get(idx);
-        label.material.map = createTextSprite(String(n)).material.map;
-        label.material.needsUpdate = true;
-      }
-    }
-  }
-
-  function resize(){
-    const rect = canvas.getBoundingClientRect();
-    const w = rect.width || window.innerWidth;
-    const h = rect.height || window.innerHeight;
-    camera.aspect = w/h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
-  }
-  window.addEventListener('resize', resize);
-
-  function setHUD(){
-    const p1 = state[P1_STORE], p2 = state[P2_STORE];
-    scoreEl.textContent = `Player 1: ${p1} • Player 2: ${p2}`;
-    if(gameOver){
-      statusEl.textContent = endText();
-      noteEl.textContent = "Start a new game to continue.";
-      return;
-    }
+  function playTone(freq, type, dur, vol) {
+    if (!enabled || !ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
     
-    if(gameMode === 'ai'){
-      if(player === 0){
-        statusEl.textContent = "Your turn (bottom row)";
-        noteEl.textContent = animating ? "Stones falling gracefully…" : "Select a pit from your side.";
-      } else {
-        statusEl.textContent = "AI thinking…";
-        noteEl.textContent = `Difficulty: ${aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)}`;
-      }
-    } else {
-      statusEl.textContent = (player===0) ? "Player 1's turn (bottom row)" : "Player 2's turn (top row)";
-      noteEl.textContent = animating ? "Stones falling gracefully…" : "Select a pit from your side.";
-    }
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + dur + 0.1);
   }
 
-  function cloneSnap(){ return { state: state.slice(), player, gameOver }; }
-  function restoreSnap(s){
-    state = s.state.slice();
-    player = s.player;
-    gameOver = s.gameOver;
-    animating = false;
-    refreshStones();
-    setHUD();
+  function playClack(pitchVar = 0) {
+    if (!enabled || !ctx) return;
+    // Wood impact simulation: Bandpass filtered noise + fast sine decay
+    const t = ctx.currentTime;
+    
+    // 1. The "Knock" (Sine with rapid pitch drop)
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const freq = 800 + (Math.random() * 200) + pitchVar;
+    osc.frequency.setValueAtTime(freq, t);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.5, t + 0.05);
+    
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.3, t + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(t + 0.15);
+
+    // 2. The "Click" (High freq impact)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(2200 + Math.random()*500, t);
+    
+    gain2.gain.setValueAtTime(0, t);
+    gain2.gain.linearRampToValueAtTime(0.1, t + 0.002);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start();
+    osc2.stop(t + 0.1);
   }
 
-  function sideEmpty(pl){
-    const pits = pl===0 ? P1_PITS : P2_PITS;
-    return pits.every(i => state[i]===0);
+  function playChime() {
+    if (!enabled || !ctx) return;
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523.25, t); // C5
+    osc.frequency.setValueAtTime(659.25, t + 0.1); // E5
+    
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.1, t + 0.1);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(t + 1.5);
   }
 
-  function collectRemainder(){
-    let p1=0,p2=0;
-    for(const i of P1_PITS){ p1+=state[i]; state[i]=0; }
-    for(const i of P2_PITS){ p2+=state[i]; state[i]=0; }
-    state[P1_STORE]+=p1;
-    state[P2_STORE]+=p2;
-  }
+  return { init, playClack, playChime, toggle: () => enabled = !enabled, isEnabled: () => enabled };
+})();
 
-  function endText(){
-    const a=state[P1_STORE], b=state[P2_STORE];
-    if(a>b) return `Game complete. Player 1 wins (${a}–${b})!`;
-    if(b>a) return `Game complete. Player 2 wins (${b}–${a})!`;
-    return `Game complete. Honorable tie (${a}–${b}).`;
-  }
+/**
+ * 3D VISUALS
+ */
+const App = (() => {
+  let scene, camera, renderer, raycaster, mouse;
+  let boardGroup, pits = [], stones = [];
+  let clickableObjects = [];
+  
+  // Game Logic State
+  const STATE = {
+    board: Array(14).fill(4),
+    turn: 0, // 0 = Player (Bottom), 1 = Opponent (Top)
+    scores: [0, 0],
+    animating: false,
+    gameOver: false,
+    mode: 'pvp', // 'pvp' or 'cpu'
+    history: []
+  };
+  
+  STATE.board[6] = 0; STATE.board[13] = 0; // Clear stores
 
-  function validMove(pit){
-    if(animating || gameOver) return false;
-    if(player===0 && !P1_PITS.includes(pit)) return false;
-    if(player===1 && !P2_PITS.includes(pit)) return false;
-    return state[pit] > 0;
-  }
+  function init() {
+    // 1. Setup Scene
+    const canvas = document.getElementById('gameCanvas');
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  function nextIndex(current, pl){
-    let i = (current + 1) % 14;
-    if(pl===0 && i===P2_STORE) i = (i + 1) % 14;
-    if(pl===1 && i===P1_STORE) i = (i + 1) % 14;
-    return i;
-  }
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color('#e6e2d3');
+    scene.fog = new THREE.Fog('#e6e2d3', 20, 50);
 
-  function delay(ms){ return new Promise(r=>setTimeout(r, ms)); }
+    camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 16, 12);
+    camera.lookAt(0, 0, 1);
 
-  async function animateDrop(fromIdx, toIdx){
-    const from = pitMeshes.get(fromIdx).position.clone();
-    const to   = pitMeshes.get(toIdx).position.clone();
-    const ghost = new THREE.Mesh(stoneGeo, stoneMats[(toIdx*5 + Math.floor(Math.random()*6))%stoneMats.length]);
-    ghost.castShadow = true;
-    ghost.receiveShadow = true;
-    ghost.position.set(from.x, 1.2, from.z);
-    scene.add(ghost);
+    // 2. Lighting (Warm, interior style)
+    const ambient = new THREE.AmbientLight(0xfff5e6, 0.6);
+    scene.add(ambient);
 
-    stoneDrop();
-
-    await new Promise(res => {
-      gsap.to(ghost.position, {
-        duration: 0.65,
-        x: to.x,
-        z: to.z,
-        ease: "power1.inOut",
-        onComplete: res
-      });
-      gsap.to(ghost.position, {
-        duration: 0.65,
-        y: 2.2,
-        ease: "sine.out",
-        yoyo: true,
-        repeat: 1
-      });
-      gsap.to(ghost.rotation, {
-        duration: 0.65,
-        x: Math.PI * 2,
-        y: Math.PI * 1.5,
-        ease: "power1.inOut"
-      });
+    const dirLight = new THREE.DirectionalLight(0xffedd9, 0.8);
+    dirLight.position.set(5, 12, 5);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.set(2048, 2048);
+    dirLight.shadow.bias = -0.0005;
+    scene.add(dirLight);
+    
+    // 3. Materials
+    const woodMap = createProceduralWood();
+    const woodMat = new THREE.MeshStandardMaterial({ 
+      map: woodMap, color: 0x8c6a4a, roughness: 0.6, metalness: 0.1 
+    });
+    const woodDarkMat = new THREE.MeshStandardMaterial({ 
+      map: woodMap, color: 0x5c4033, roughness: 0.5, metalness: 0.1 
     });
 
-    scene.remove(ghost);
+    // 4. Build Board
+    boardGroup = new THREE.Group();
+    scene.add(boardGroup);
+
+    // Main slab
+    const slabGeo = new THREE.BoxGeometry(16, 1.2, 6);
+    // Round the box visually using a modifier or just smooth shading? Box is fine for now, let's add a rim.
+    const slab = new THREE.Mesh(slabGeo, woodMat);
+    slab.castShadow = true;
+    slab.receiveShadow = true;
+    slab.position.y = -0.6;
+    boardGroup.add(slab);
+
+    // Create Pits (Boolean subtraction is hard in vanilla Three.js, so we build up)
+    // We will place "Rims" on top of the slab to denote pits.
+    createPits(woodDarkMat);
+
+    // 5. Tatami Floor
+    const floorGeo = new THREE.PlaneGeometry(60, 60);
+    const floorMat = new THREE.MeshStandardMaterial({ 
+      color: 0xd6cebd, roughness: 0.9, 
+      map: createTatamiTex() 
+    });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -1.25;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    // 6. Interaction
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+    window.addEventListener('resize', onResize);
+    canvas.addEventListener('mousedown', onClick);
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        onClick(e.touches[0]);
+    }, {passive: false});
+
+    // Start Loop
+    animate();
+    updateHUD();
   }
 
-  async function makeMove(pit){
-    if(!validMove(pit)){ return; }
-
-    history.push(cloneSnap());
-    animating = true;
-    setHUD();
-
-    let stones = state[pit];
-    state[pit] = 0;
-    refreshStones();
-
-    let idx = pit;
-    let last = pit;
-
-    while(stones > 0){
-      idx = nextIndex(idx, player);
-      await animateDrop(pit, idx);
-      state[idx] += 1;
-      stones -= 1;
-      last = idx;
-      refreshStones();
-      await delay(120);
-    }
-
-    const landedInMyPit =
-      (player===0 && P1_PITS.includes(last)) ||
-      (player===1 && P2_PITS.includes(last));
-
-    if(landedInMyPit && state[last]===1){
-      const opp = OPP(last);
-      if(state[opp] > 0){
-        const captured = state[opp] + 1;
-        state[opp]=0;
-        state[last]=0;
-        const store = player===0 ? P1_STORE : P2_STORE;
-        state[store]+=captured;
-        captureSound();
-        await delay(300);
-        refreshStones();
-      }
-    }
-
-    if(sideEmpty(0) || sideEmpty(1)){
-      collectRemainder();
-      gameOver = true;
-      animating = false;
-      refreshStones();
-      setHUD();
-      return;
-    }
-
-    const myStore = player===0 ? P1_STORE : P2_STORE;
-    const extra = (last === myStore);
-    if(extra) extraTurnSound();
-    if(!extra) player = 1 - player;
-
-    animating = false;
-    setHUD();
+  // --- Procedural Textures ---
+  function createProceduralWood() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#bfa';
+    ctx.fillRect(0,0,512,512);
     
-    if(!gameOver && isAIPlayer[player]){
-      await delay(800);
-      const aiMove = getAIMove(player, aiDifficulty);
-      if(aiMove !== null) await makeMove(aiMove);
+    // Noise
+    for(let i=0; i<6000; i++){
+        ctx.fillStyle = `rgba(100, 70, 40, ${Math.random()*0.08})`;
+        ctx.fillRect(Math.random()*512, 0, Math.random()*2+1, 512);
     }
+    // Grain curves
+    ctx.strokeStyle = 'rgba(60, 40, 20, 0.05)';
+    ctx.lineWidth = 2;
+    for(let i=0; i<20; i++){
+        ctx.beginPath();
+        ctx.moveTo(Math.random()*512, 0);
+        ctx.bezierCurveTo(Math.random()*512, 150, Math.random()*512, 350, Math.random()*512, 512);
+        ctx.stroke();
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    return tex;
   }
 
-  function getAIMove(pl, difficulty){
-    const moves = (pl===0 ? P1_PITS : P2_PITS).filter(i => state[i]>0);
-    if(!moves.length) return null;
+  function createTatamiTex() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256; canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#eaddcf';
+    ctx.fillRect(0,0,256,256);
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    for(let y=0; y<256; y+=4) ctx.fillRect(0, y, 256, 1);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(16,16);
+    return tex;
+  }
 
-    if(difficulty === 'easy'){
-      return moves[Math.floor(Math.random()*moves.length)];
-    }
+  // --- Board Construction ---
+  function createPits(mat) {
+    // 6 pits bottom (0-5), Store Right (6), 6 pits top (7-12), Store Left (13)
+    const positions = [];
+    
+    // Bottom Row (Player 0) - Left to Right
+    for(let i=0; i<6; i++) positions.push({x: -4.5 + i*1.8, z: 1.5, id: i});
+    
+    // Right Store
+    positions.push({x: 6.5, z: 0, scale: 1.5, id: 6}); // Player 0 Store
+    
+    // Top Row (Player 1) - Right to Left
+    for(let i=0; i<6; i++) positions.push({x: 4.5 - i*1.8, z: -1.5, id: 7+i});
+    
+    // Left Store
+    positions.push({x: -6.5, z: 0, scale: 1.5, id: 13}); // Player 1 Store
 
-    let best = moves[0], bestScore = -1e9;
-    for(const m of moves){
-      const sim = simulate(state, pl, m);
-      let score = (sim.extra?100:0) + sim.deltaStore*15 + sim.capture*12;
+    const geo = new THREE.TorusGeometry(0.7, 0.15, 16, 32);
+    const hitGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.5, 16);
+    const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+
+    positions.forEach(p => {
+      const rim = new THREE.Mesh(geo, mat);
+      rim.rotation.x = Math.PI/2;
+      rim.position.set(p.x, 0.05, p.z);
+      if(p.scale) rim.scale.set(1.2, 1.5, 1);
+      else rim.scale.set(1, 1.1, 1);
       
-      if(difficulty === 'medium'){
-        score += (Math.random()-0.5)*20;
-      } else if(difficulty === 'hard'){
-        const oppMoves = (pl===0 ? P2_PITS : P1_PITS).filter(i => state[i]>0);
-        let oppBest = -1e9;
-        for(const om of oppMoves){
-          const oppSim = simulate(state, 1-pl, om);
-          const oppScore = oppSim.deltaStore*10 + oppSim.capture*8;
-          oppBest = Math.max(oppBest, oppScore);
-        }
-        score -= oppBest * 0.5;
-      } else if(difficulty === 'impossible'){
-        const oppMoves = (pl===0 ? P2_PITS : P1_PITS).filter(i => state[i]>0);
-        let oppBest = -1e9;
-        for(const om of oppMoves){
-          const oppSim = simulate(state, 1-pl, om);
-          const oppScore = oppSim.deltaStore*20 + oppSim.capture*15;
-          oppBest = Math.max(oppBest, oppScore);
-        }
-        score -= oppBest * 0.8;
-        const myStore = pl===0 ? P1_STORE : P2_STORE;
-        const oppStore = pl===0 ? P2_STORE : P1_STORE;
-        const lead = state[myStore] - state[oppStore];
-        score += lead * 5;
+      rim.castShadow = true;
+      rim.receiveShadow = true;
+      boardGroup.add(rim);
+
+      // Click trigger
+      const hit = new THREE.Mesh(hitGeo, hitMat);
+      hit.position.set(p.x, 0.2, p.z);
+      if(p.scale) hit.scale.set(1.5, 1, 1.5);
+      hit.userData = { id: p.id };
+      boardGroup.add(hit);
+      clickableObjects.push(hit);
+
+      // Data storage
+      pits[p.id] = { 
+        pos: new THREE.Vector3(p.x, 0, p.z), 
+        stones: [] 
+      };
+      
+      // Initial Stones
+      if(p.id !== 6 && p.id !== 13) {
+        spawnStones(p.id, 4);
+      }
+    });
+  }
+
+  // --- Stone Logic ---
+  const stoneGeo = new THREE.DodecahedronGeometry(0.22, 1); // Low poly pebble
+  // Squash it slightly to look like a Go stone
+  stoneGeo.scale(1, 0.6, 1);
+
+  const stoneMat1 = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.4, metalness: 0.1 }); // Slate
+  const stoneMat2 = new THREE.MeshStandardMaterial({ color: 0xfffff0, roughness: 0.4, metalness: 0.1 }); // Shell
+
+  function spawnStones(pitIndex, count) {
+    for(let i=0; i<count; i++) {
+      const mat = Math.random() > 0.5 ? stoneMat1 : stoneMat2;
+      const mesh = new THREE.Mesh(stoneGeo, mat);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      
+      // Organic placement
+      placeStoneInPit(mesh, pits[pitIndex].pos, pits[pitIndex].stones.length, pitIndex === 6 || pitIndex === 13);
+      
+      boardGroup.add(mesh);
+      pits[pitIndex].stones.push(mesh);
+      stones.push(mesh);
+    }
+  }
+
+  function placeStoneInPit(mesh, center, index, isStore) {
+    // Random offset within circle
+    const radius = isStore ? 0.8 : 0.45;
+    const r = Math.sqrt(Math.random()) * radius;
+    const theta = Math.random() * Math.PI * 2;
+    
+    // Stack height based on index roughly
+    const y = -0.5 + (index * 0.12) + (Math.random() * 0.05);
+    
+    mesh.position.set(
+      center.x + r * Math.cos(theta),
+      y,
+      center.z + r * Math.sin(theta)
+    );
+    
+    mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+  }
+
+  // --- Animation ---
+  function moveStonesAnimated(fromPit, count) {
+    return new Promise(async (resolve) => {
+      STATE.animating = true;
+      
+      // 1. Pick up stones
+      const movingStones = pits[fromPit].stones.splice(0, count); // Take all
+      STATE.board[fromPit] = 0; // Logic update
+      
+      // Visual pickup
+      movingStones.forEach(s => {
+        gsap.to(s.position, { y: 2, duration: 0.3, ease: "back.out(1.7)" });
+      });
+      await wait(300);
+
+      let currentPit = fromPit;
+      let lastPit = -1;
+
+      // 2. Distribute loop
+      for(let i=0; i<movingStones.length; i++) {
+        const stone = movingStones[i];
+        
+        // Calculate next pit logic
+        currentPit = (currentPit + 1) % 14;
+        
+        // Skip opponent store
+        if(STATE.turn === 0 && currentPit === 13) currentPit = 0;
+        else if(STATE.turn === 1 && currentPit === 6) currentPit = 7;
+        
+        // Logic Update
+        STATE.board[currentPit]++;
+        
+        // Visual Drop
+        const targetPitObj = pits[currentPit];
+        const isStore = (currentPit === 6 || currentPit === 13);
+        
+        // Calculate organic landing spot
+        const radius = isStore ? 0.8 : 0.45;
+        const r = Math.sqrt(Math.random()) * radius;
+        const theta = Math.random() * Math.PI * 2;
+        const targetPos = new THREE.Vector3(
+          targetPitObj.pos.x + r * Math.cos(theta),
+          -0.4 + (targetPitObj.stones.length * 0.12), // Stack on existing
+          targetPitObj.pos.z + r * Math.sin(theta)
+        );
+
+        // Animate Trajectory (Parabolic)
+        const dur = 0.4;
+        gsap.to(stone.position, {
+          x: targetPos.x,
+          z: targetPos.z,
+          duration: dur,
+          ease: "power1.inOut"
+        });
+        
+        // Height arc
+        gsap.to(stone.position, {
+          y: 2.5,
+          duration: dur/2,
+          yoyo: true,
+          repeat: 1,
+          ease: "power1.out"
+        });
+        
+        // Final settle
+        gsap.to(stone.position, {
+          y: targetPos.y,
+          duration: dur/2,
+          delay: dur/2,
+          ease: "bounce.out",
+          onComplete: () => {
+             AudioEngine.playClack(i*20); // Pitch up slightly as we go
+          }
+        });
+
+        // Rotation for tumble effect
+        gsap.to(stone.rotation, {
+          x: Math.random()*6, z: Math.random()*6,
+          duration: dur,
+          ease: "none"
+        });
+
+        targetPitObj.stones.push(stone);
+        lastPit = currentPit;
+        
+        updateHUD(); // Live update numbers
+        await wait(150); // Speed of distribution
       }
       
-      if(score > bestScore){
-        bestScore = score;
-        best = m;
+      resolve(lastPit);
+    });
+  }
+
+  // --- Game Rules ---
+  async function handleTurn(pitIndex) {
+    if(STATE.animating || STATE.gameOver) return;
+    
+    // Save state for Undo
+    STATE.history.push(JSON.parse(JSON.stringify({board: STATE.board, turn: STATE.turn})));
+    
+    // 1. Move
+    const stonesInHand = STATE.board[pitIndex];
+    if(stonesInHand === 0) return;
+    
+    const lastPit = await moveStonesAnimated(pitIndex, stonesInHand);
+    
+    // 2. Rules
+    let repeatTurn = false;
+    const isMySide = (STATE.turn === 0 && lastPit < 6) || (STATE.turn === 1 && lastPit > 6 && lastPit < 13);
+    const myStore = STATE.turn === 0 ? 6 : 13;
+    
+    // Rule: Land in own store -> Repeat turn
+    if(lastPit === myStore) {
+      repeatTurn = true;
+      AudioEngine.playChime();
+    }
+    
+    // Rule: Capture (Land in empty pit on own side)
+    if(isMySide && STATE.board[lastPit] === 1 && lastPit !== myStore) {
+      const oppIndex = 12 - lastPit;
+      if(STATE.board[oppIndex] > 0) {
+        await captureStones(lastPit, oppIndex, myStore);
       }
     }
+    
+    checkWinCondition();
 
-    return best;
-  }
-
-  function undo(){
-    if(animating) return;
-    const snap = history.pop();
-    if(!snap){ return; }
-    restoreSnap(snap);
-  }
-
-  function hint(){
-    if(animating || gameOver){ return; }
-    const moves = (player===0 ? P1_PITS : P2_PITS).filter(i => state[i]>0);
-    if(!moves.length){ return; }
-
-    let best = moves[0], bestScore=-1e9;
-    for(const m of moves){
-      const sim = simulate(state, player, m);
-      const score = (sim.extra?50:0) + sim.deltaStore*10 + sim.capture*7;
-      if(score>bestScore){ bestScore=score; best=m; }
-    }
-    noteEl.textContent = `Suggestion: consider pit ${labelPit(best)}.`;
-  }
-
-  function labelPit(i){
-    if(i>=0 && i<=5) return String(i+1);
-    if(i>=7 && i<=12) return String(13-i);
-    return String(i);
-  }
-
-  function simulate(s, pl, pit){
-    const arr = s.slice();
-    const myStore = pl===0 ? P1_STORE : P2_STORE;
-    const oppStore = pl===0 ? P2_STORE : P1_STORE;
-    const myPits = pl===0 ? P1_PITS : P2_PITS;
-
-    const before = arr[myStore];
-    let stones = arr[pit]; arr[pit]=0;
-    let idx = pit, last=pit;
-
-    while(stones>0){
-      idx = (idx+1)%14;
-      if(pl===0 && idx===oppStore) continue;
-      if(pl===1 && idx===oppStore) continue;
-      arr[idx]+=1;
-      stones--;
-      last=idx;
-    }
-
-    let capture=0;
-    if(myPits.includes(last) && arr[last]===1){
-      const opp = OPP(last);
-      if(arr[opp]>0){
-        capture = arr[opp]+1;
-        arr[opp]=0; arr[last]=0;
-        arr[myStore]+=capture;
+    if(!repeatTurn && !STATE.gameOver) {
+      STATE.turn = 1 - STATE.turn;
+      updateHUD();
+      if(STATE.turn === 1 && STATE.mode === 'cpu') {
+        setTimeout(cpuTurn, 1000);
       }
+    } else {
+      updateHUD();
     }
-    const extra = (last===myStore);
-    return { state:arr, deltaStore: arr[myStore]-before, extra, capture };
+    
+    STATE.animating = false;
   }
 
-  function onPointer(e){
-    if(overlay.style.display !== "none") return;
-    if(animating || gameOver) return;
-    if(isAIPlayer[player]) return;
+  async function captureStones(myPit, oppPit, store) {
+    AudioEngine.playChime();
+    // Move my stone and opp stones to store
+    const countMy = STATE.board[myPit];
+    const countOpp = STATE.board[oppPit];
+    
+    STATE.board[myPit] = 0;
+    STATE.board[oppPit] = 0;
+    STATE.board[store] += (countMy + countOpp);
+    
+    // Visuals
+    const stonesToMove = [...pits[myPit].stones, ...pits[oppPit].stones];
+    pits[myPit].stones = [];
+    pits[oppPit].stones = [];
+    
+    stonesToMove.forEach(s => {
+      pits[store].stones.push(s);
+      gsap.to(s.position, {
+        x: pits[store].pos.x,
+        z: pits[store].pos.z,
+        y: Math.random(),
+        duration: 0.8,
+        ease: "back.inOut(1.2)"
+      });
+    });
+    
+    await wait(800);
+  }
 
-    const t = e.touches && e.touches[0];
-    const cx = t ? t.clientX : e.clientX;
-    const cy = t ? t.clientY : e.clientY;
+  function checkWinCondition() {
+    const p1Empty = STATE.board.slice(0,6).every(n => n===0);
+    const p2Empty = STATE.board.slice(7,13).every(n => n===0);
+    
+    if(p1Empty || p2Empty) {
+      STATE.gameOver = true;
+      // Collect remainders
+      [0,1,2,3,4,5].forEach(i => { STATE.board[6] += STATE.board[i]; STATE.board[i]=0; });
+      [7,8,9,10,11,12].forEach(i => { STATE.board[13] += STATE.board[i]; STATE.board[i]=0; });
+      
+      // Visual Refresh needed to show cleared board? 
+      // For simplicity, just update HUD text
+      const winner = STATE.board[6] > STATE.board[13] ? "Player 1 Wins!" : (STATE.board[13] > STATE.board[6] ? "Player 2 Wins!" : "It's a Tie!");
+      document.getElementById('status').innerHTML = `<span style="color:#d9534f">${winner}</span>`;
+      AudioEngine.playChime();
+    }
+  }
 
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = ((cx - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -(((cy - rect.top) / rect.height) * 2 - 1);
+  function cpuTurn() {
+    // Simple AI: Prioritize free turns, then captures, then random
+    const validMoves = [7,8,9,10,11,12].filter(i => STATE.board[i] > 0);
+    if(validMoves.length === 0) return;
+    
+    // 1. Check for free turn
+    let bestMove = validMoves.find(i => {
+      let end = (i + STATE.board[i]) % 14;
+      // Logic approximation
+      return end === 13;
+    });
+    
+    // 2. Random if no free turn
+    if(bestMove === undefined) {
+      bestMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+    }
+    
+    handleTurn(bestMove);
+  }
+
+  // --- Utility ---
+  function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  function onClick(e) {
+    if(STATE.animating || STATE.gameOver) return;
+    if(STATE.turn === 1 && STATE.mode === 'cpu') return;
+
+    // Audio init on first interaction
+    AudioEngine.init();
+
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const hits = raycaster.intersectObjects(clickable, true);
-    if(!hits.length) return;
+    const intersects = raycaster.intersectObjects(clickableObjects);
 
-    const pit = hits[0].object.userData.index;
-    makeMove(pit);
+    if(intersects.length > 0) {
+      const id = intersects[0].object.userData.id;
+      // Validate Move
+      if(STATE.turn === 0 && id >= 0 && id <= 5) handleTurn(id);
+      else if(STATE.turn === 1 && id >= 7 && id <= 12) handleTurn(id);
+    }
   }
 
-  canvas.addEventListener('click', onPointer);
-  canvas.addEventListener('touchstart', onPointer, { passive:true });
-
-  btnNew.addEventListener('click', () => { reset(); });
-  btnUndo.addEventListener('click', () => undo());
-  btnHint.addEventListener('click', () => hint());
-
-  btnPlay.addEventListener('click', () => {
-    gameMode = '2player';
-    isAIPlayer = [false, false];
-    overlay.style.display = "none";
-    initAudio();
-    resize();
-    reset();
-    setHUD();
-  });
-  btnPlayFS.addEventListener('click', async () => {
-    gameMode = '2player';
-    isAIPlayer = [false, false];
-    overlay.style.display = "none";
-    await goFullscreen();
-    initAudio();
-    resize();
-    reset();
-    setHUD();
-  });
-
-  function startAIGame(difficulty){
-    gameMode = 'ai';
-    aiDifficulty = difficulty;
-    isAIPlayer = [false, true];
-    overlay.style.display = "none";
-    initAudio();
-    resize();
-    reset();
-    setHUD();
+  function updateHUD() {
+    document.getElementById('p1-score').innerText = `You: ${STATE.board[6]}`;
+    document.getElementById('p2-score').innerText = `Opponent: ${STATE.board[13]}`;
+    if(!STATE.gameOver) {
+      const txt = STATE.turn === 0 ? "Your Turn" : (STATE.mode === 'cpu' ? "CPU Thinking..." : "Player 2 Turn");
+      document.getElementById('status').innerText = txt;
+    }
   }
 
-  btnAIEasy.addEventListener('click', () => startAIGame('easy'));
-  btnAIMedium.addEventListener('click', () => startAIGame('medium'));
-  btnAIHard.addEventListener('click', () => startAIGame('hard'));
-  btnAIImpossible.addEventListener('click', () => startAIGame('impossible'));
+  function onResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
 
-  document.addEventListener('keydown', (e) => {
-    const k = e.key.toLowerCase();
-    if(k==="n") reset();
-    if(k==="u") undo();
-    if(k==="f") goFullscreen();
-  });
-
-  function animate(){
+  function animate() {
     requestAnimationFrame(animate);
-    boardGroup.rotation.y = Math.sin(performance.now()*0.0002)*0.015;
     renderer.render(scene, camera);
   }
 
-  function reset(){
-    state = new Array(14).fill(4);
-    state[P1_STORE]=0; state[P2_STORE]=0;
-    player = 0;
-    animating = false;
-    gameOver = false;
-    history.length = 0;
-    refreshStones();
-    setHUD();
+  function fullReset() {
+    // Clear meshes
+    stones.forEach(s => boardGroup.remove(s));
+    stones = [];
+    pits.forEach(p => p.stones = []);
+    
+    // Reset State
+    STATE.board = Array(14).fill(4);
+    STATE.board[6]=0; STATE.board[13]=0;
+    STATE.turn = 0;
+    STATE.gameOver = false;
+    STATE.animating = false;
+    
+    // Respawn visuals
+    [0,1,2,3,4,5,7,8,9,10,11,12].forEach(i => spawnStones(i, 4));
+    updateHUD();
   }
 
-  function start(){
-    const stage = document.getElementById('stage');
-    stage.style.height = Math.max(480, Math.min(760, window.innerHeight * 0.68)) + "px";
-
-    reset();
-    resize();
-    setHUD();
-    animate();
-  }
-
-  start();
+  return { init, setMode: (m) => STATE.mode = m, reset: fullReset, undo: () => alert("Undo not implemented in this visual demo yet!"), toggleSound: AudioEngine.toggle };
 })();
+
+// Global Hooks
+function startGame(mode) {
+  document.getElementById('modal').classList.add('hidden');
+  App.setMode(mode);
+  App.init(); // Audio context starts here
+}
+
+document.getElementById('btn-restart').onclick = () => {
+    App.reset();
+};
+document.getElementById('btn-sound').onclick = (e) => {
+    App.toggleSound();
+    e.target.innerText = e.target.innerText.includes("ON") ? "Sound: OFF" : "Sound: ON";
+};
+
+// Initialize only the landing visual
 </script>
 </body>
 </html>
