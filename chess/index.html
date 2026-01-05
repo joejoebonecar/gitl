@@ -199,6 +199,11 @@
       transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       position: relative;
       z-index: 5;
+      font-family: 'Segoe UI Symbol', 'Arial Unicode MS', sans-serif;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .piece:hover {
@@ -212,8 +217,18 @@
       cursor: grabbing;
     }
 
-    .piece.white { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,.8); }
-    .piece.black { color: #000; text-shadow: 0 0 10px rgba(255,255,255,.3), 2px 2px 0 #fff; }
+    .piece.white {
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255,255,255,.8);
+      background: rgba(255,255,255,0.2); /* Temporary debug background */
+      border-radius: 50%;
+    }
+    .piece.black {
+      color: #000;
+      text-shadow: 0 0 10px rgba(255,255,255,.3), 2px 2px 0 #fff;
+      background: rgba(0,0,0,0.3); /* Temporary debug background */
+      border-radius: 50%;
+    }
 
     /* SIDEBAR */
     .sidebar {
@@ -500,6 +515,7 @@
     }
 
     function initBoard() {
+      console.log('Initializing board...');
       const startPos = [
         ['r','n','b','q','k','b','n','r'],
         ['p','p','p','p','p','p','p','p'],
@@ -511,6 +527,7 @@
         ['R','N','B','Q','K','B','N','R']
       ];
 
+      let pieceCount = 0;
       for(let row = 0; row < 8; row++) {
         for(let col = 0; col < 8; col++) {
           const piece = startPos[row][col];
@@ -520,16 +537,27 @@
               color: piece === piece.toLowerCase() ? 'black' : 'white',
               hasMoved: false
             };
+            pieceCount++;
+            console.log('Added piece at', row, col, ':', board[row][col]);
+          } else {
+            board[row][col] = null;
           }
         }
       }
+      console.log('Board initialized with', pieceCount, 'pieces');
       renderBoard();
       updateStatus();
     }
 
     function renderBoard() {
       const boardElement = document.getElementById('board');
+      if (!boardElement) {
+        console.error('Board element not found!');
+        return;
+      }
       boardElement.innerHTML = '';
+
+      console.log('Rendering board...');
 
       for(let row = 0; row < 8; row++) {
         for(let col = 0; col < 8; col++) {
@@ -541,15 +569,19 @@
 
           const piece = board[row][col];
           if(piece) {
+            console.log('Adding piece at', row, col, ':', piece);
             const pieceElement = document.createElement('div');
             pieceElement.className = `piece ${piece.color}`;
             pieceElement.textContent = PIECES[piece.color][piece.type];
+            console.log('Piece symbol:', PIECES[piece.color][piece.type]);
             square.appendChild(pieceElement);
           }
 
           boardElement.appendChild(square);
         }
       }
+
+      console.log('Board rendered with', boardElement.children.length, 'squares');
     }
 
     function onSquareClick(e) {
