@@ -194,6 +194,7 @@
     .piece {
       font-size: min(8vmin, 60px);
       cursor: grab;
+      -webkit-user-select: none;
       user-select: none;
       filter: drop-shadow(0 0 5px rgba(0,0,0,0.8));
       transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -218,16 +219,10 @@
     }
 
     .piece.white {
-      color: #fff;
-      text-shadow: 0 0 10px rgba(255,255,255,.8);
-      background: rgba(255,255,255,0.2); /* Temporary debug background */
-      border-radius: 50%;
+      filter: drop-shadow(0 0 3px rgba(255,255,255,0.8));
     }
     .piece.black {
-      color: #000;
-      text-shadow: 0 0 10px rgba(255,255,255,.3), 2px 2px 0 #fff;
-      background: rgba(0,0,0,0.3); /* Temporary debug background */
-      border-radius: 50%;
+      filter: drop-shadow(0 0 3px rgba(0,0,0,0.8));
     }
 
     /* SIDEBAR */
@@ -422,20 +417,20 @@
   <script>
     const PIECES = {
       white: {
-        king: '♔',
-        queen: '♕',
-        rook: '♖',
-        bishop: '♗',
-        knight: '♘',
-        pawn: '♙'
+        king: 'pieces/white-king.svg',
+        queen: 'pieces/white-queen.svg',
+        rook: 'pieces/white-rook.svg',
+        bishop: 'pieces/white-bishop.svg',
+        knight: 'pieces/white-knight.svg',
+        pawn: 'pieces/white-pawn.svg'
       },
       black: {
-        king: '♚',
-        queen: '♛',
-        rook: '♜',
-        bishop: '♝',
-        knight: '♞',
-        pawn: '♟'
+        king: 'pieces/black-king.svg',
+        queen: 'pieces/black-queen.svg',
+        rook: 'pieces/black-rook.svg',
+        bishop: 'pieces/black-bishop.svg',
+        knight: 'pieces/black-knight.svg',
+        pawn: 'pieces/black-pawn.svg'
       }
     };
 
@@ -570,10 +565,21 @@
           const piece = board[row][col];
           if(piece) {
             console.log('Adding piece at', row, col, ':', piece);
-            const pieceElement = document.createElement('div');
+            const pieceElement = document.createElement('img');
             pieceElement.className = `piece ${piece.color}`;
-            pieceElement.textContent = PIECES[piece.color][piece.type];
-            console.log('Piece symbol:', PIECES[piece.color][piece.type]);
+            pieceElement.src = PIECES[piece.color][piece.type];
+            pieceElement.alt = `${piece.color} ${piece.type}`;
+            pieceElement.style.width = '8vmin';
+            pieceElement.style.height = '8vmin';
+            pieceElement.style.objectFit = 'contain';
+            pieceElement.style.position = 'absolute';
+            pieceElement.style.top = '50%';
+            pieceElement.style.left = '50%';
+            pieceElement.style.transform = 'translate(-50%, -50%)';
+            pieceElement.style.maxWidth = '35px';
+            pieceElement.style.maxHeight = '35px';
+            pieceElement.draggable = false;
+            console.log('Piece image:', PIECES[piece.color][piece.type]);
             square.appendChild(pieceElement);
           }
 
@@ -736,8 +742,31 @@
     }
 
     function updateCapturedPieces() {
-      document.getElementById('capturedWhite').textContent = capturedWhite.join(' ');
-      document.getElementById('capturedBlack').textContent = capturedBlack.join(' ');
+      const whiteContainer = document.getElementById('capturedWhite');
+      const blackContainer = document.getElementById('capturedBlack');
+
+      whiteContainer.innerHTML = '';
+      blackContainer.innerHTML = '';
+
+      capturedWhite.forEach(pieceSymbol => {
+        const img = document.createElement('img');
+        img.src = pieceSymbol;
+        img.alt = 'captured piece';
+        img.style.width = '25px';
+        img.style.height = '25px';
+        img.style.margin = '0 3px';
+        whiteContainer.appendChild(img);
+      });
+
+      capturedBlack.forEach(pieceSymbol => {
+        const img = document.createElement('img');
+        img.src = pieceSymbol;
+        img.alt = 'captured piece';
+        img.style.width = '25px';
+        img.style.height = '25px';
+        img.style.margin = '0 3px';
+        blackContainer.appendChild(img);
+      });
     }
 
     function resetGame() {
