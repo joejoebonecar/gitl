@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>blackjack.exe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #eef2ff;
+            color: #000;
+            padding: 20px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: normal;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #d6daf0;
+            border: 1px solid #b7c5d9;
+        }
+
+        .game-area {
+            background: #f0e0d6;
+            border: 1px solid #b7c5d9;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .dealer-area, .player-area {
+            margin-bottom: 30px;
+        }
+
+        .label {
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: lowercase;
+        }
+
+        .cards {
+            min-height: 100px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #b7c5d9;
+            margin-bottom: 10px;
+        }
+
+        .score {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            background: #d6daf0;
+            border: 1px solid #b7c5d9;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 8px 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            background: #f0e0d6;
+            border: 1px solid #b7c5d9;
+            cursor: pointer;
+            text-transform: lowercase;
+        }
+
+        button:hover {
+            background: #e0d0c6;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            font-size: 14px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #b7c5d9;
+            margin-bottom: 10px;
+            text-transform: lowercase;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #34345c;
+            text-decoration: underline;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .back-link:hover {
+            color: #dd0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>blackjack.exe</h1>
+
+        <div class="status" id="status">
+            click 'new game' to start
+        </div>
+
+        <div class="game-area">
+            <div class="dealer-area">
+                <div class="label">dealer:</div>
+                <div class="cards" id="dealer-cards">
+                    <!-- dealer cards will go here -->
+                </div>
+                <div class="score" id="dealer-score">score: -</div>
+            </div>
+
+            <div class="player-area">
+                <div class="label">player:</div>
+                <div class="cards" id="player-cards">
+                    <!-- player cards will go here -->
+                </div>
+                <div class="score" id="player-score">score: -</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="new-game-btn">new game</button>
+            <button id="hit-btn" disabled>hit</button>
+            <button id="stand-btn" disabled>stand</button>
+            <button id="double-btn" disabled>double down</button>
+        </div>
+
+        <a href="../index.html" class="back-link">back to /gitl/</a>
+    </div>
+
+    <script>
+        // game logic goes here
+        console.log('blackjack.exe loaded');
+    </script>
+</body>
+</html>
