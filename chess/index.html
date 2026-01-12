@@ -552,7 +552,7 @@ button:active {
         const piece = startPos[row][col];
         if(piece) {
           board[row][col] = {
-            type: piece.toLowerCase(),
+            type: PIECE_NAMES[piece.toLowerCase()],
             color: piece === piece.toLowerCase() ? 'black' : 'white',
             hasMoved: false
           };
@@ -582,9 +582,8 @@ button:active {
         if(piece) {
           const pieceElement = document.createElement('img');
           pieceElement.className = `piece ${piece.color}`;
-          const pieceName = PIECE_NAMES[piece.type];
-          pieceElement.src = PIECES[piece.color][pieceName];
-          pieceElement.alt = `${piece.color} ${pieceName}`;
+          pieceElement.src = PIECES[piece.color][piece.type];
+          pieceElement.alt = `${piece.color} ${piece.type}`;
           pieceElement.draggable = false;
 
           // CHAOS: Make pieces invisible
@@ -732,11 +731,10 @@ button:active {
     const capturedPiece = board[actualToRow][actualToCol];
 
     if(capturedPiece) {
-      const capturedPieceName = PIECE_NAMES[capturedPiece.type];
       if(capturedPiece.color === 'white') {
-        capturedWhite.push(PIECES[capturedPiece.color][capturedPieceName]);
+        capturedWhite.push(PIECES[capturedPiece.color][capturedPiece.type]);
       } else {
-        capturedBlack.push(PIECES[capturedPiece.color][capturedPieceName]);
+        capturedBlack.push(PIECES[capturedPiece.color][capturedPiece.type]);
       }
       updateCapturedPieces();
       playSound(800, 0.2);
