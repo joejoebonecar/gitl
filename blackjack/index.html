@@ -150,7 +150,246 @@
     </div>
 
     <script>
-        // game logic goes here
+        // Blackjack Game Logic
+        let deck = [];
+        let dealerHand = [];
+        let playerHand = [];
+        let gameActive = false;
+        let playerStands = false;
+        let canDoubleDown = false;
+
+        // Card suits and values
+        const suits = ['♠', '♥', '♦', '♣'];
+        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+        // Create and shuffle deck
+        function createDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ value, suit });
+                }
+            }
+            shuffleDeck();
+        }
+
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        // Calculate hand value
+        function calculateScore(hand) {
+            let score = 0;
+            let aces = 0;
+
+            for (let card of hand) {
+                if (card.value === 'A') {
+                    aces++;
+                    score += 11;
+                } else if (['J', 'Q', 'K'].includes(card.value)) {
+                    score += 10;
+                } else {
+                    score += parseInt(card.value);
+                }
+            }
+
+            // Adjust for aces
+            while (score > 21 && aces > 0) {
+                score -= 10;
+                aces--;
+            }
+
+            return score;
+        }
+
+        // Display cards
+        function displayCards(hand, elementId, hideFirst = false) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';
+
+            hand.forEach((card, index) => {
+                if (hideFirst && index === 0) {
+                    element.innerHTML += '[hidden] ';
+                } else {
+                    element.innerHTML += `[${card.value}${card.suit}] `;
+                }
+            });
+        }
+
+        // Update scores
+        function updateScores(revealDealer = false) {
+            const playerScore = calculateScore(playerHand);
+            document.getElementById('player-score').textContent = `score: ${playerScore}`;
+
+            if (revealDealer) {
+                const dealerScore = calculateScore(dealerHand);
+                document.getElementById('dealer-score').textContent = `score: ${dealerScore}`;
+            } else {
+                document.getElementById('dealer-score').textContent = 'score: ?';
+            }
+        }
+
+        // Update status message
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        // Deal a card
+        function dealCard(hand) {
+            if (deck.length === 0) {
+                createDeck();
+            }
+            const card = deck.pop();
+            hand.push(card);
+            return card;
+        }
+
+        // Check for blackjack
+        function hasBlackjack(hand) {
+            return hand.length === 2 && calculateScore(hand) === 21;
+        }
+
+        // Start new game
+        function newGame() {
+            createDeck();
+            dealerHand = [];
+            playerHand = [];
+            gameActive = true;
+            playerStands = false;
+            canDoubleDown = true;
+
+            // Deal initial cards
+            dealCard(playerHand);
+            dealCard(dealerHand);
+            dealCard(playerHand);
+            dealCard(dealerHand);
+
+            displayCards(dealerHand, 'dealer-cards', true);
+            displayCards(playerHand, 'player-cards');
+            updateScores(false);
+
+            // Check for blackjack
+            if (hasBlackjack(playerHand)) {
+                if (hasBlackjack(dealerHand)) {
+                    endGame('push! both have blackjack');
+                } else {
+                    endGame('blackjack! you win!');
+                }
+                return;
+            }
+
+            updateStatus('your turn - hit or stand?');
+            enableButtons(true);
+        }
+
+        // Player hits
+        function hit() {
+            if (!gameActive) return;
+
+            canDoubleDown = false;
+            document.getElementById('double-btn').disabled = true;
+
+            dealCard(playerHand);
+            displayCards(playerHand, 'player-cards');
+            updateScores(false);
+
+            const playerScore = calculateScore(playerHand);
+            if (playerScore > 21) {
+                endGame('bust! dealer wins');
+            } else if (playerScore === 21) {
+                stand();
+            }
+        }
+
+        // Player stands
+        function stand() {
+            if (!gameActive) return;
+
+            playerStands = true;
+            enableButtons(false);
+            updateStatus('dealer\'s turn...');
+
+            // Reveal dealer's cards
+            displayCards(dealerHand, 'dealer-cards', false);
+            updateScores(true);
+
+            // Dealer plays
+            setTimeout(dealerPlay, 800);
+        }
+
+        // Dealer plays
+        function dealerPlay() {
+            let dealerScore = calculateScore(dealerHand);
+
+            // Dealer must hit on 16 or less, stand on 17+
+            if (dealerScore < 17) {
+                dealCard(dealerHand);
+                displayCards(dealerHand, 'dealer-cards', false);
+                updateScores(true);
+                setTimeout(dealerPlay, 800);
+            } else {
+                // Determine winner
+                determineWinner();
+            }
+        }
+
+        // Double down
+        function doubleDown() {
+            if (!gameActive || !canDoubleDown) return;
+
+            dealCard(playerHand);
+            displayCards(playerHand, 'player-cards');
+            updateScores(false);
+
+            const playerScore = calculateScore(playerHand);
+            if (playerScore > 21) {
+                endGame('bust! dealer wins');
+            } else {
+                stand();
+            }
+        }
+
+        // Determine winner
+        function determineWinner() {
+            const playerScore = calculateScore(playerHand);
+            const dealerScore = calculateScore(dealerHand);
+
+            if (dealerScore > 21) {
+                endGame('dealer busts! you win!');
+            } else if (playerScore > dealerScore) {
+                endGame('you win!');
+            } else if (dealerScore > playerScore) {
+                endGame('dealer wins');
+            } else {
+                endGame('push! it\'s a tie');
+            }
+        }
+
+        // End game
+        function endGame(message) {
+            gameActive = false;
+            updateStatus(message);
+            displayCards(dealerHand, 'dealer-cards', false);
+            updateScores(true);
+            enableButtons(false);
+        }
+
+        // Enable/disable game buttons
+        function enableButtons(enable) {
+            document.getElementById('hit-btn').disabled = !enable;
+            document.getElementById('stand-btn').disabled = !enable;
+            document.getElementById('double-btn').disabled = !enable || !canDoubleDown;
+        }
+
+        // Event listeners
+        document.getElementById('new-game-btn').addEventListener('click', newGame);
+        document.getElementById('hit-btn').addEventListener('click', hit);
+        document.getElementById('stand-btn').addEventListener('click', stand);
+        document.getElementById('double-btn').addEventListener('click', doubleDown);
+
         console.log('blackjack.exe loaded');
     </script>
 </body>
