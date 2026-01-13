@@ -217,6 +217,253 @@ button.primary:hover:not(:disabled) {
 .spinning-card {
   animation: spin 1s linear infinite;
 }
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .container {
+    max-width: 100%;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .title {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .back-link {
+    font-size: 11px;
+  }
+
+  .game-container {
+    padding: 8px;
+  }
+
+  .status {
+    font-size: 13px;
+    padding: 10px 8px;
+  }
+
+  .table {
+    padding: 12px;
+    min-height: 250px;
+  }
+
+  .hand {
+    margin: 12px 0;
+    padding: 10px;
+  }
+
+  .hand-title {
+    font-size: 11px;
+  }
+
+  .cards {
+    gap: 6px;
+    min-height: 50px;
+  }
+
+  .card {
+    padding: 6px 10px;
+    font-size: 16px;
+    min-width: 40px;
+  }
+
+  .score {
+    font-size: 13px;
+  }
+
+  .controls {
+    gap: 6px;
+  }
+
+  button {
+    min-width: 100px;
+    padding: 14px 10px;
+    font-size: 11px;
+    min-height: 44px; /* Touch-friendly */
+  }
+
+  .info-panel {
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .info-panel h3 {
+    font-size: 11px;
+  }
+
+  #aiTrashTalk {
+    padding: 10px;
+    min-height: 60px;
+    font-size: 11px;
+  }
+
+  .warning {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .disclaimer {
+    padding: 10px;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  #modeSelector {
+    padding: 16px !important;
+  }
+
+  #modeSelector h2 {
+    font-size: 14px !important;
+    margin-bottom: 12px !important;
+  }
+
+  #modeSelector button {
+    padding: 14px !important;
+    font-size: 12px !important;
+    min-height: 50px;
+  }
+
+  /* Chaos controls grid - stack on mobile */
+  #chaosControls .info-panel > div {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+
+  #chaosControls label {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+    padding: 4px;
+  }
+
+  .header {
+    padding: 8px;
+  }
+
+  .title {
+    font-size: 12px;
+  }
+
+  .game-container {
+    padding: 6px;
+  }
+
+  .status {
+    font-size: 12px;
+    padding: 8px 6px;
+    margin-bottom: 8px;
+  }
+
+  .table {
+    padding: 8px;
+    border-radius: 12px;
+    min-height: 200px;
+  }
+
+  .hand {
+    margin: 10px 0;
+    padding: 8px;
+  }
+
+  .hand-title {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  .cards {
+    gap: 4px;
+    min-height: 45px;
+  }
+
+  .card {
+    padding: 5px 8px;
+    font-size: 14px;
+    min-width: 35px;
+  }
+
+  .score {
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  .controls {
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  button {
+    min-width: 80px;
+    padding: 12px 8px;
+    font-size: 10px;
+    min-height: 44px;
+  }
+
+  .info-panel {
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+
+  .info-panel h3 {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  #aiTrashTalk {
+    padding: 8px;
+    min-height: 50px;
+    font-size: 10px;
+  }
+
+  .warning {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  .disclaimer {
+    padding: 8px;
+    font-size: 9px;
+    margin-bottom: 8px;
+  }
+
+  #modeSelector {
+    padding: 12px !important;
+  }
+
+  #modeSelector h2 {
+    font-size: 12px !important;
+    margin-bottom: 10px !important;
+  }
+
+  #modeSelector button {
+    padding: 12px !important;
+    font-size: 11px !important;
+    margin: 6px 0 !important;
+  }
+
+  #chaosControls label {
+    font-size: 10px;
+  }
+
+  #chaosControls input[type="checkbox"] {
+    transform: scale(0.9);
+  }
+}
 </style>
 </head>
 <body>
