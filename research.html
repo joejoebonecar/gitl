@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Research: Similar Projects - /gitl/</title>
+  <style>
+    :root{
+      --bg: #f0e0d6;
+      --fg: #800000;
+      --post-bg: #f0e0d6;
+      --post-highlight: #d6bad0;
+      --border: #d9bfb7;
+      --link: #34345c;
+      --link-hover: #dd0000;
+      --quote: #789922;
+      --name: #117743;
+      --subject: #0f0c5d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: arial, helvetica, sans-serif;
+      font-size: 10pt;
+      padding: 0;
+      margin: 0;
+    }
+
+    .boardBanner {
+      background: var(--post-highlight);
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      padding: 5px;
+      font-weight: bold;
+    }
+
+    .boardTitle {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--subject);
+      padding: 10px;
+    }
+
+    .boardSubtitle {
+      font-size: 9pt;
+      color: var(--fg);
+      padding-bottom: 8px;
+    }
+
+    a {
+      color: var(--link);
+      text-decoration: underline;
+    }
+
+    a:hover {
+      color: var(--link-hover);
+    }
+
+    /* Password overlay */
+    #passwordOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #passwordOverlay.hidden {
+      display: none;
+    }
+
+    .passwordBox {
+      background: var(--post-bg);
+      border: 2px solid var(--border);
+      padding: 30px;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .passwordBox h2 {
+      color: var(--subject);
+      margin-bottom: 15px;
+    }
+
+    .passwordBox input {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid var(--border);
+      background: white;
+      font-family: arial, helvetica, sans-serif;
+      font-size: 10pt;
+    }
+
+    .passwordBox button {
+      background: var(--post-highlight);
+      border: 1px solid var(--border);
+      padding: 8px 20px;
+      cursor: pointer;
+      font-family: arial, helvetica, sans-serif;
+      font-size: 10pt;
+      margin-top: 10px;
+    }
+
+    .passwordBox button:hover {
+      background: var(--border);
+    }
+
+    .error {
+      color: var(--link-hover);
+      margin-top: 10px;
+      font-size: 9pt;
+    }
+
+    /* Content */
+    #content {
+      display: none;
+      padding: 20px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    #content.visible {
+      display: block;
+    }
+
+    .backLink {
+      margin: 10px 0;
+      font-size: 9pt;
+    }
+
+    h1, h2, h3 {
+      color: var(--subject);
+      margin: 20px 0 10px 0;
+    }
+
+    h1 { font-size: 24px; }
+    h2 { font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+    h3 { font-size: 14px; }
+
+    p, li {
+      line-height: 1.6;
+      margin: 8px 0;
+    }
+
+    ul, ol {
+      margin-left: 30px;
+    }
+
+    hr {
+      border: none;
+      border-top: 2px solid var(--border);
+      margin: 30px 0;
+    }
+
+    code {
+      background: var(--post-highlight);
+      padding: 2px 5px;
+      font-family: monospace;
+    }
+
+    .quote {
+      color: var(--quote);
+    }
+
+    blockquote {
+      border-left: 3px solid var(--border);
+      margin: 10px 0;
+      padding-left: 15px;
+      color: var(--quote);
+    }
+
+    strong {
+      color: var(--name);
+      font-weight: bold;
+    }
+
+    .section {
+      margin: 30px 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Password overlay -->
+  <div id="passwordOverlay">
+    <div class="passwordBox">
+      <h2>🔒 RESTRICTED ACCESS</h2>
+      <p>This research is password protected.</p>
+      <p style="font-size:8pt; margin-top:10px;">hint: it's not very secure</p>
+      <input type="password" id="passwordInput" placeholder="Enter password" />
+      <br>
+      <button onclick="checkPassword()">Submit</button>
+      <div class="error" id="errorMsg"></div>
+    </div>
+  </div>
+
+  <!-- Main content (hidden until password correct) -->
+  <div id="content">
+    <div class="boardBanner">
+      <div class="boardTitle">Research: Similar Projects</div>
+      <div class="boardSubtitle">an autistic deep dive into brutalist portfolios and imageboard aesthetics</div>
+    </div>
+
+    <div class="backLink">
+      [<a href="index.html">← Back to /gitl/</a>]
+    </div>
+
+    <div class="section">
+      <h1>Research: Similar Projects to GuyInTheLoop.com</h1>
+      <p><strong>Research Date:</strong> January 11, 2026</p>
+      <p><strong>Branch:</strong> claude/research-similar-projects-xlBz0</p>
+    </div>
+
+    <div class="section">
+      <h2>Project Summary</h2>
+      <p><strong>GuyInTheLoop.com</strong> is a brutalist imageboard-themed portfolio website featuring:</p>
+      <ul>
+        <li>4chan/imageboard aesthetic with Yotsuba B color palette</li>
+        <li>Interactive games: Chess, 3D Chess, Mancala, Blackjack, Fireworks</li>
+        <li>Educational content: World Desserts page</li>
+        <li>Self-deprecating, tongue-in-cheek tone</li>
+        <li>Pure vanilla JavaScript/HTML/CSS (no frameworks)</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <h2>1. Design Aesthetic & Trends</h2>
+
+      <h3>Brutalist Web Design</h3>
+      <p>Your project fits squarely within the <strong>brutalist web design</strong> movement, which has been gaining traction in 2025-2026.</p>
+
+      <p><strong>Key Characteristics:</strong></p>
+      <ul>
+        <li>Raw, unpolished aesthetics</li>
+        <li>Bold typography and high-contrast color schemes</li>
+        <li>Minimalist layouts prioritizing function over form</li>
+        <li>Rejection of modern "sameness" in web design</li>
+        <li>Early 2000s web aesthetic</li>
+      </ul>
+
+      <p><strong>Resources:</strong></p>
+      <ul>
+        <li><a href="https://brutalistwebsites.com/" target="_blank">Brutalist Websites</a> - The definitive directory</li>
+        <li><a href="https://www.awwwards.com/awwwards/collections/brutalism/" target="_blank">Awwwards Brutalism Collection</a></li>
+        <li><a href="https://www.qodeinteractive.com/magazine/best-examples-of-brutalism-in-web-design/" target="_blank">60 Best Examples of Brutalism</a></li>
+        <li><a href="https://www.todaymade.com/blog/brutalist-web-design" target="_blank">Brutalist Web Design Guide</a></li>
+        <li><a href="https://www.wix.com/blog/brutalist-websites" target="_blank">11 Inspiring Examples</a></li>
+      </ul>
+
+      <h3>Y2K Aesthetic & Early Internet Nostalgia</h3>
+      <p>Your imageboard theme taps into Y2K nostalgia:</p>
+
+      <p><strong>Key Elements:</strong></p>
+      <ul>
+        <li>Bright colors, neon gradients</li>
+        <li>Pixelated graphics and low-fi images</li>
+        <li>Flashy animations reminiscent of early web</li>
+        <li>"New frontier" internet feeling</li>
+      </ul>
+
+      <p><strong>Resources:</strong></p>
+      <ul>
+        <li><a href="https://www.webdesignmuseum.org/exhibitions/y2k-aesthetic-in-web-design" target="_blank">Y2K Aesthetic in Web Design</a></li>
+        <li><a href="https://www.wix.com/studio/blog/y2k-design" target="_blank">How to Make a Y2K Website</a></li>
+        <li><a href="https://webflow.com/blog/y2k-aesthetic" target="_blank">Y2K Aesthetic - Webflow Guide</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Y2K_aesthetic" target="_blank">Y2K Aesthetic Wikipedia</a></li>
+      </ul>
+
+      <h3>Retro Website Design (2025)</h3>
+      <p><strong>Trends:</strong></p>
+      <ul>
+        <li>"Retro Maximalist" aesthetic with bold saturated colors</li>
+        <li>Pixelation, grainy textures, chunky retro typefaces</li>
+        <li>Personal portfolios showing creativity with throwback designs</li>
+      </ul>
+
+      <p><strong>Examples:</strong></p>
+      <ul>
+        <li>Lars Olson's portfolio - 80s-inspired color palette</li>
+        <li>Cameron's World - homage to early 90s era with chaotic design</li>
+        <li>Quentin.XYZ - retro-futuristic with neon accents and pixelated fonts</li>
+      </ul>
+
+      <p><strong>Resources:</strong></p>
+      <ul>
+        <li><a href="https://colorlib.com/wp/retro-websites/" target="_blank">16 Best Retro Websites for 2026</a></li>
+        <li><a href="https://reallygooddesigns.com/retro-website-designs/" target="_blank">30 Unique Retro Website Designs</a></li>
+        <li><a href="https://www.awwwards.com/websites/retro/" target="_blank">Best Retro Websites - Awwwards</a></li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <h2>2. GitHub Repositories - Similar Projects</h2>
+
+      <h3>Brutalist Portfolios</h3>
+      <p><strong>Direct Matches:</strong></p>
+
+      <ol>
+        <li>
+          <strong><a href="https://github.com/avcvz/avcvz" target="_blank">avcvz/avcvz</a></strong> - Personal portfolio website with brutalist design
+          <ul>
+            <li>JavaScript (82.2%), HTML (15.6%), CSS</li>
+            <li>Most similar to your aesthetic</li>
+          </ul>
+        </li>
+        <li>
+          <strong><a href="https://github.com/dhruvkb/portfolio-brut" target="_blank">dhruvkb/portfolio-brut</a></strong> - Semi-brutalist portfolio
+          <ul>
+            <li>Described as "my small personal slice of the Internet"</li>
+            <li>Old-school approach similar to yours</li>
+          </ul>
+        </li>
+        <li>
+          <strong><a href="https://brutalpress.neocities.org/" target="_blank">BrutalPress</a></strong> - Brutalist WordPress theme
+          <ul>
+            <li>Can be converted to static HTML</li>
+            <li>Emphasizes accessibility and content-first design</li>
+          </ul>
+        </li>
+      </ol>
+
+      <p><strong>Topics to Explore:</strong></p>
+      <ul>
+        <li><a href="https://github.com/topics/brutalist" target="_blank">GitHub - brutalist topic</a></li>
+        <li><a href="https://github.com/topics/neo-brutalism" target="_blank">GitHub - neo-brutalism topic</a></li>
+        <li><a href="https://github.com/topics/brutalism" target="_blank">GitHub - brutalism topic</a></li>
+      </ul>
+
+      <h3>Interactive Game Portfolios</h3>
+      <p><strong>Highly Relevant:</strong></p>
+
+      <ol>
+        <li>
+          <strong><a href="https://github.com/nrcaz/Mario-Portfolio" target="_blank">nrcaz/Mario-Portfolio</a></strong> - A small Mario level as an interactive portfolio
+          <ul>
+            <li>100% Vanilla JavaScript (like yours!)</li>
+            <li>No frameworks or game engines</li>
+            <li>Creative approach to portfolio presentation</li>
+          </ul>
+        </li>
+        <li>
+          <strong><a href="https://github.com/schouffy/gamedev-portfolio" target="_blank">schouffy/gamedev-portfolio</a></strong> - Gamedev portfolio template
+          <ul>
+            <li>Visual showcase of work</li>
+            <li>Built with VueJS, static and responsive</li>
+          </ul>
+        </li>
+        <li>
+          <strong><a href="https://github.com/rheh/HTML5-canvas-projects" target="_blank">rheh/HTML5-canvas-projects</a></strong> - Collection of canvas projects
+          <ul>
+            <li>Includes chess, car race sim, bouncing ball</li>
+            <li>Similar to your multi-game approach</li>
+          </ul>
+        </li>
+      </ol>
+
+      <p><strong>Canvas/Game Resources:</strong></p>
+      <ul>
+        <li><a href="https://github.com/IceCreamYou/HTML5-Canvas-Game-Boilerplate" target="_blank">HTML5 Canvas Game Boilerplate</a></li>
+        <li><a href="https://github.com/KaliedaRik/Scrawl-canvas" target="_blank">Scrawl-canvas</a> - Interactive canvas elements library</li>
+        <li><a href="https://github.com/topics/html5-canvas-game" target="_blank">html5-canvas-game topic</a></li>
+        <li><a href="https://github.com/topics/canvas-game?l=javascript" target="_blank">canvas-game topic</a></li>
+      </ul>
+
+      <h3>General Portfolio Inspiration</h3>
+      <ul>
+        <li><a href="https://github.com/emmabostian/developer-portfolios" target="_blank">emmabostian/developer-portfolios</a> - Large list of developer portfolios</li>
+        <li><a href="https://github.com/Evavic44/portfolio-ideas" target="_blank">Evavic44/portfolio-ideas</a> - Curated portfolio ideas</li>
+        <li><a href="https://github.com/smaranjitghose/awesome-portfolio-websites" target="_blank">smaranjitghose/awesome-portfolio-websites</a> - Community-maintained resources</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <h2>3. Neocities & IndieWeb Community</h2>
+
+      <h3>Neocities Sites</h3>
+      <p>Neocities is a <strong>MAJOR</strong> hub for brutalist/retro personal sites like yours!</p>
+
+      <p><strong>Browse By Tag:</strong></p>
+      <ul>
+        <li><a href="https://neocities.org/browse?tag=portfolio" target="_blank">Neocities - portfolio tag</a></li>
+        <li><a href="https://neocities.org/browse?sort_by=views&tag=brutalist" target="_blank">Neocities - brutalist tag</a></li>
+        <li><a href="https://neocities.org/browse?tag=brutalism" target="_blank">Neocities - brutalism tag</a></li>
+      </ul>
+
+      <p><strong>Notable Example:</strong></p>
+      <ul>
+        <li>
+          <strong>Eloy Benoffi's Portfolio (2025)</strong> - Brutalist, glitchy portfolio built with Webflow and GSAP
+          <ul>
+            <li>Won Awwwards Honorable Mention, GSAP Site of the Day</li>
+            <li>Features: "brutalist structure, maximalist energy, ASCII art, bold motion design"</li>
+            <li><a href="https://tympanus.net/codrops/2025/10/15/from-blank-canvas-to-mayhem-eloy-benoffis-brutalist-glitchy-portfolio-built-with-webflow-and-gsap/" target="_blank">Read case study</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <p><strong>Example Portfolio:</strong></p>
+      <ul>
+        <li><a href="https://tracychristensonportfolio.neocities.org/" target="_blank">Tracy Christenson's Portfolio</a></li>
+      </ul>
+
+      <h3>IndieWeb Philosophy</h3>
+      <p>Your site embodies the <strong>IndieWeb</strong> philosophy!</p>
+
+      <p><strong>Core Principles:</strong></p>
+      <ul>
+        <li>Own your website and posts</li>
+        <li>No algorithm, no lock-in</li>
+        <li>Creative freedom and personality</li>
+        <li>Nostalgic personality inspired by MySpace/GeoCities</li>
+      </ul>
+
+      <p><strong>Resources:</strong></p>
+      <ul>
+        <li><a href="https://berryhouse.ca/blog/indieweb-weird-retro-guide/" target="_blank">IndieWeb 101 and Making Your Site Delightfully Weird</a> - Comprehensive guide (August 2025)</li>
+        <li>Tiny 88×31 pixel buttons for nostalgic 90s/00s feel</li>
+        <li>Background images with retro patterns</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <h2>4. Twitter/X Community</h2>
+
+      <h3>Active Accounts & Discussions</h3>
+
+      <p><strong>Follow These:</strong></p>
+      <ul>
+        <li><a href="https://x.com/brutalistthemes" target="_blank">@BrutalistThemes</a> - Brutalist WordPress themes</li>
+        <li><a href="https://x.com/brutalistfwk" target="_blank">@brutalistfwk</a> - Brutalist Framework (CSS3, JS, HTML5)</li>
+      </ul>
+
+      <p><strong>Recent Discussions:</strong></p>
+
+      <ol>
+        <li>
+          <strong>REFORM Template</strong> (January 2025)
+          <ul>
+            <li><a href="https://x.com/getframeplate/status/1947278637038006495" target="_blank">Frameplate tweet</a></li>
+            <li>Bold brutalist template for design agencies</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Brutalist Debate</strong>
+          <ul>
+            <li><a href="https://x.com/readymag/status/1659046400695361538" target="_blank">Readymag discussion</a></li>
+            <li>"Brutalist websites don't aim to look comfortable and easy"</li>
+          </ul>
+        </li>
+        <li>
+          <strong>AI Tools for Brutalism</strong>
+          <ul>
+            <li><a href="https://x.com/max_leiter/status/1900027257282060373" target="_blank">Max Leiter using v0</a></li>
+            <li>"Asking v0 to make website's brutalist is my new favorite thing"</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Nigodo Library</strong>
+          <ul>
+            <li><a href="https://x.com/shuffleeditor/status/1504812804649459718" target="_blank">Shuffle's Tailwind CSS library</a></li>
+            <li>"Can brutalist design be pretty?"</li>
+          </ul>
+        </li>
+      </ol>
+
+      <p><strong>Themes/Resources Found:</strong></p>
+      <ul>
+        <li><a href="https://x.com/tatulip/status/1017110100471832576" target="_blank">Free brutalist blog theme for Netlify CMS</a></li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <h2>5. Reddit Communities</h2>
+
+      <h3>Subreddits to Post In</h3>
+      <p>While specific "imageboard portfolio" discussions are rare, these communities would appreciate your work:</p>
+
+      <p><strong>Primary:</strong></p>
+      <ul>
+        <li>r/webdev - General web development</li>
+        <li>r/web_design - Web design showcase and critique</li>
+        <li>r/InternetIsBeautiful - Unique/interesting websites</li>
+        <li>r/programming - For the technical aspects</li>
+      </ul>
+
+      <p><strong>Niche:</strong></p>
+      <ul>
+        <li>r/brutalism - Architecture/design (may appreciate digital brutalism)</li>
+        <li>r/neocities - Active Neocities community</li>
+        <li>r/PersonalSites - For showcasing personal websites</li>
+        <li>r/web_design - Design-focused community</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <h2>6. Imageboard Culture & Software</h2>
+
+      <h3>Active Imageboards (2025)</h3>
+      <p>If you want to understand the culture your site parodies:</p>
+
+      <p><strong>Top Imageboards:</strong></p>
+      <ul>
+        <li>4chan - The original (still unchanged since inception)</li>
+        <li>2chan (Futaba Channel) - The 2001 Japanese original</li>
+        <li>8chan/8kun - Alternative imageboards</li>
+      </ul>
+
+      <p><strong>Resources:</strong></p>
+      <ul>
+        <li><a href="https://www.pdnob.com/knowledge/imageboard-websites.html" target="_blank">5 Best Imageboard Websites (2025)</a></li>
+        <li><a href="https://www.tenorshare.com/image-translator/imageboard-websites.html" target="_blank">Top 6 Imageboard Websites for Anime Fans</a></li>
+        <li><a href="https://www.oreateai.com/blog/chan-image-board-list/678b8b684ec12f5a712d73b78e2116a1" target="_blank">Chan Image Board List</a></li>
+      </ul>
+
+      <p><strong>Design Notes:</strong></p>
+      <ul>
+        <li>Minimalist design and image-centric posts</li>
+        <li>Interfaces largely unchanged, appealing to users who value nostalgia and functionality</li>
+        <li>Thread-based discussions with anonymous posting</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <h2>7. Key Takeaways & Recommendations</h2>
+
+      <h3>What Makes Your Site Unique</h3>
+      <ol>
+        <li><strong>Full imageboard parody</strong> - Most brutalist sites don't go this far</li>
+        <li><strong>Multiple games</strong> - Interactive elements are rare in brutalist portfolios</li>
+        <li><strong>Self-aware humor</strong> - The meta-commentary and self-deprecation</li>
+        <li><strong>Pure vanilla JS</strong> - No frameworks, respectable in 2026</li>
+        <li><strong>Educational component</strong> - The desserts page adds unexpected depth</li>
+      </ol>
+
+      <h3>Communities That Would Love This</h3>
+      <ol>
+        <li><strong>Neocities</strong> - Post your site there! Perfect fit.</li>
+        <li><strong>IndieWeb</strong> - Aligns with the philosophy</li>
+        <li><strong>r/InternetIsBeautiful</strong> - Unique enough to get attention</li>
+        <li><strong>Hacker News</strong> - If you frame it as "anti-framework" or discuss the design choices</li>
+        <li><strong>Twitter/X brutalist community</strong> - Tag @BrutalistThemes, @brutalistfwk</li>
+      </ol>
+
+      <h3>Similar Vibes Found</h3>
+
+      <p><strong>Most Similar Project:</strong></p>
+      <ul>
+        <li><strong>Mario-Portfolio</strong> - Interactive game as portfolio showcase</li>
+      </ul>
+
+      <p><strong>Closest Aesthetic:</strong></p>
+      <ul>
+        <li><strong>avcvz/avcvz</strong> - Brutalist personal site</li>
+        <li><strong>dhruvkb/portfolio-brut</strong> - Semi-brutalist "slice of the Internet"</li>
+        <li><strong>Eloy Benoffi's 2025 portfolio</strong> - Award-winning brutalist/glitchy design</li>
+      </ul>
+
+      <p><strong>Same Philosophy:</strong></p>
+      <ul>
+        <li>The entire Neocities community</li>
+        <li>IndieWeb movement</li>
+        <li>Anti-framework, vanilla JS advocates</li>
+      </ul>
+
+      <h3>People Doing Similar Things</h3>
+
+      <p><strong>Design Approach:</strong></p>
+      <ul>
+        <li>Brutalist web designers on Neocities</li>
+        <li>Y2K/retro web revival creators</li>
+        <li>IndieWeb advocates making "delightfully weird" sites</li>
+      </ul>
+
+      <p><strong>Interactive Portfolios:</strong></p>
+      <ul>
+        <li>nrcaz (Mario Portfolio)</li>
+        <li>Game developers on GitHub using canvas</li>
+        <li>Creative coders on CodePen/Observable</li>
+      </ul>
+
+      <p><strong>Imageboard Aesthetic:</strong></p>
+      <ul>
+        <li>Very few people are doing this specifically</li>
+        <li><strong>You're pioneering this niche!</strong></li>
+        <li>Closest are sites that embrace early 2000s forum/board aesthetics</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <h2>8. Next Steps & Promotion Ideas</h2>
+
+      <h3>Where to Share</h3>
+      <ol>
+        <li><strong>Neocities</strong> - Create a mirror or link</li>
+        <li><strong>Hacker News</strong> - "Show HN: An imageboard-themed portfolio with vanilla JS games"</li>
+        <li><strong>Reddit:</strong>
+          <ul>
+            <li>r/InternetIsBeautiful</li>
+            <li>r/webdev (as "Roast my portfolio")</li>
+            <li>r/web_design</li>
+          </ul>
+        </li>
+        <li><strong>Twitter/X</strong> - Tag brutalist design accounts</li>
+        <li><strong>Brutalist Websites Directory</strong> - Submit for inclusion</li>
+      </ol>
+
+      <h3>Engagement Hooks</h3>
+      <ul>
+        <li>"I built an entire portfolio site pretending to be 4chan"</li>
+        <li>"No frameworks, pure vanilla JS: Here's why"</li>
+        <li>"Brutalist web design meets imageboard culture"</li>
+        <li>"My 9-year-old's dessert project is hosted on a parody imageboard"</li>
+      </ul>
+
+      <h3>Potential Improvements (If Desired)</h3>
+      <ul>
+        <li>Add more Easter eggs in the "?" random Wikipedia links</li>
+        <li>Create a "catalog" view that actually works</li>
+        <li>Add a guestbook (very Web 1.0)</li>
+        <li>88×31 pixel buttons linking to similar sites</li>
+        <li>RSS feed for "new posts" (updates)</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <h2>Conclusion</h2>
+
+      <p><strong>Your project sits at a unique intersection:</strong></p>
+      <ul>
+        <li>Brutalist web design (trending in 2025-2026)</li>
+        <li>Y2K/early internet nostalgia</li>
+        <li>Imageboard culture (rarely parodied in portfolio sites)</li>
+        <li>Interactive canvas games (uncommon in portfolios)</li>
+        <li>IndieWeb philosophy (own your content, no frameworks)</li>
+      </ul>
+
+      <blockquote>
+        <p><strong>Bottom line:</strong> You're doing something genuinely unique. While brutalist portfolios exist and game-based portfolios exist, the full imageboard parody with multiple vanilla JS games is rare. The closest parallel is the Mario-Portfolio, but yours goes much further with the aesthetic commitment.</p>
+      </blockquote>
+
+      <p>The Neocities community and IndieWeb folks would absolutely love this. Consider posting there and engaging with the brutalist design community on Twitter/X. You're not following a trend—you're creating a niche within a niche, and that's always more interesting than following the crowd.</p>
+
+      <p style="text-align:center; margin-top:30px; font-style:italic;">
+        Keep building weird stuff.
+      </p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <p style="font-size:8pt; text-align:center; color:#999;">
+        <strong>Research compiled by:</strong> Claude (Sonnet 4.5)<br>
+        <strong>Date:</strong> January 11, 2026<br>
+        <strong>For:</strong> GuyInTheLoop.com brutalist portfolio research
+      </p>
+    </div>
+
+    <div class="backLink" style="margin-top:30px;">
+      [<a href="index.html">← Back to /gitl/</a>]
+    </div>
+  </div>
+
+  <script>
+    const correctPassword = 'password123456789';
+
+    function checkPassword() {
+      const input = document.getElementById('passwordInput').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (input === correctPassword) {
+        document.getElementById('passwordOverlay').classList.add('hidden');
+        document.getElementById('content').classList.add('visible');
+        sessionStorage.setItem('researchAccess', 'granted');
+      } else {
+        errorMsg.textContent = '❌ Wrong password. Try again, newfriend.';
+      }
+    }
+
+    // Allow Enter key to submit
+    document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkPassword();
+      }
+    });
+
+    // Check if already authenticated in this session
+    if (sessionStorage.getItem('researchAccess') === 'granted') {
+      document.getElementById('passwordOverlay').classList.add('hidden');
+      document.getElementById('content').classList.add('visible');
+    }
+  </script>
+</body>
+</html>
