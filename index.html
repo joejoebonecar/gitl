@@ -166,6 +166,150 @@
       --op-bg: #e0e0e0;
     }
 
+    /* Theme: Psychedelic (trippy bright colors) */
+    [data-theme="psychedelic"] {
+      --bg: #ff00ff;
+      --fg: #00ff00;
+      --post-bg: #ff6ec7;
+      --post-highlight: #00ffff;
+      --border: #ffff00;
+      --link: #7b68ee;
+      --link-hover: #ff1493;
+      --quote: #39ff14;
+      --name: #ff00ff;
+      --admin: #ff0000;
+      --subject: #00ffff;
+      --op-bg: #ff69b4;
+    }
+
+    /* Theme: Psychedelic Dark (trippy colors on dark) */
+    [data-theme="psychedelic-dark"] {
+      --bg: #0a0014;
+      --fg: #ff00ff;
+      --post-bg: #1a0033;
+      --post-highlight: #2d004d;
+      --border: #ff00ff;
+      --link: #00ffff;
+      --link-hover: #ff1493;
+      --quote: #39ff14;
+      --name: #ff6ec7;
+      --admin: #ff0000;
+      --subject: #ffff00;
+      --op-bg: #2d004d;
+    }
+
+    /* Theme: Vaporwave (aesthetic pink/cyan) */
+    [data-theme="vaporwave"] {
+      --bg: #1a1a2e;
+      --fg: #ff71ce;
+      --post-bg: #16213e;
+      --post-highlight: #0f3460;
+      --border: #ff71ce;
+      --link: #01cdfe;
+      --link-hover: #ff71ce;
+      --quote: #05ffa1;
+      --name: #b967ff;
+      --admin: #ff0000;
+      --subject: #fffb96;
+      --op-bg: #0f3460;
+    }
+
+    /* Theme: Matrix (green on black hacker) */
+    [data-theme="matrix"] {
+      --bg: #000000;
+      --fg: #00ff00;
+      --post-bg: #0a0a0a;
+      --post-highlight: #001a00;
+      --border: #003300;
+      --link: #00cc00;
+      --link-hover: #00ff00;
+      --quote: #00ff66;
+      --name: #33ff33;
+      --admin: #ff0000;
+      --subject: #00ff00;
+      --op-bg: #001a00;
+    }
+
+    /* Theme: Cyberpunk (neon on dark) */
+    [data-theme="cyberpunk"] {
+      --bg: #0d0d0d;
+      --fg: #fcee0a;
+      --post-bg: #1a1a1a;
+      --post-highlight: #2a2a2a;
+      --border: #ff2a6d;
+      --link: #05d9e8;
+      --link-hover: #ff2a6d;
+      --quote: #d1f7ff;
+      --name: #ff2a6d;
+      --admin: #ff0000;
+      --subject: #fcee0a;
+      --op-bg: #2a2a2a;
+    }
+
+    /* Theme: Sunset (warm oranges and reds) */
+    [data-theme="sunset"] {
+      --bg: #2c1810;
+      --fg: #ffd4a3;
+      --post-bg: #3d2318;
+      --post-highlight: #5c3d2e;
+      --border: #ff6b35;
+      --link: #f7c59f;
+      --link-hover: #ff9f1c;
+      --quote: #ffbf69;
+      --name: #ff6b35;
+      --admin: #ff0000;
+      --subject: #ffd166;
+      --op-bg: #5c3d2e;
+    }
+
+    /* Theme: Ocean (cool blues and teals) */
+    [data-theme="ocean"] {
+      --bg: #0a1628;
+      --fg: #a8d8ea;
+      --post-bg: #112240;
+      --post-highlight: #1a365d;
+      --border: #64b5f6;
+      --link: #80deea;
+      --link-hover: #4dd0e1;
+      --quote: #00e5ff;
+      --name: #26c6da;
+      --admin: #ff5252;
+      --subject: #81d4fa;
+      --op-bg: #1a365d;
+    }
+
+    /* Theme: Forest (natural greens) */
+    [data-theme="forest"] {
+      --bg: #1a2f1a;
+      --fg: #c8e6c9;
+      --post-bg: #2d4a2d;
+      --post-highlight: #3d5c3d;
+      --border: #66bb6a;
+      --link: #a5d6a7;
+      --link-hover: #81c784;
+      --quote: #aed581;
+      --name: #66bb6a;
+      --admin: #ff5252;
+      --subject: #c5e1a5;
+      --op-bg: #3d5c3d;
+    }
+
+    /* Theme: Midnight (deep blues) */
+    [data-theme="midnight"] {
+      --bg: #0d1b2a;
+      --fg: #e0e1dd;
+      --post-bg: #1b263b;
+      --post-highlight: #415a77;
+      --border: #778da9;
+      --link: #90caf9;
+      --link-hover: #64b5f6;
+      --quote: #a5d6a7;
+      --name: #ce93d8;
+      --admin: #f48fb1;
+      --subject: #b39ddb;
+      --op-bg: #415a77;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -598,6 +742,17 @@
       border-bottom: none;
     }
 
+    .theme-category {
+      display: block;
+      padding: 6px 12px;
+      font-size: 8pt;
+      color: var(--fg);
+      opacity: 0.6;
+      text-align: center;
+      background: var(--post-highlight);
+      border-bottom: 1px solid var(--border);
+    }
+
     .dropdownContent a.active {
       background: var(--post-highlight);
       font-weight: bold;
@@ -647,11 +802,24 @@
     [<span class="themeDropdown">
       <a href="#" onclick="return false;">Themes ▼</a>
       <div class="dropdownContent">
+        <span class="theme-category">── Classic ──</span>
         <a href="#" onclick="setTheme('yotsuba'); return false;" data-theme-option="yotsuba">Yotsuba</a>
         <a href="#" onclick="setTheme('yotsuba-b'); return false;" data-theme-option="yotsuba-b">Yotsuba B</a>
         <a href="#" onclick="setTheme('tomorrow'); return false;" data-theme-option="tomorrow">Tomorrow</a>
         <a href="#" onclick="setTheme('photon'); return false;" data-theme-option="photon">Photon</a>
         <a href="#" onclick="setTheme('futaba'); return false;" data-theme-option="futaba">Futaba</a>
+        <span class="theme-category">── Psychedelic ──</span>
+        <a href="#" onclick="setTheme('psychedelic'); return false;" data-theme-option="psychedelic">Psychedelic</a>
+        <a href="#" onclick="setTheme('psychedelic-dark'); return false;" data-theme-option="psychedelic-dark">Psychedelic Dark</a>
+        <a href="#" onclick="setTheme('vaporwave'); return false;" data-theme-option="vaporwave">Vaporwave</a>
+        <a href="#" onclick="setTheme('matrix'); return false;" data-theme-option="matrix">Matrix</a>
+        <a href="#" onclick="setTheme('cyberpunk'); return false;" data-theme-option="cyberpunk">Cyberpunk</a>
+        <span class="theme-category">── Nature ──</span>
+        <a href="#" onclick="setTheme('sunset'); return false;" data-theme-option="sunset">Sunset</a>
+        <a href="#" onclick="setTheme('ocean'); return false;" data-theme-option="ocean">Ocean</a>
+        <a href="#" onclick="setTheme('forest'); return false;" data-theme-option="forest">Forest</a>
+        <a href="#" onclick="setTheme('midnight'); return false;" data-theme-option="midnight">Midnight</a>
+        <span class="theme-category">── Accessibility ──</span>
         <a href="#" onclick="setTheme('protanopia'); return false;" data-theme-option="protanopia">Protanopia</a>
         <a href="#" onclick="setTheme('deuteranopia'); return false;" data-theme-option="deuteranopia">Deuteranopia</a>
         <a href="#" onclick="setTheme('tritanopia'); return false;" data-theme-option="tritanopia">Tritanopia</a>
