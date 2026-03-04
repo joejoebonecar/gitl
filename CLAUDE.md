@@ -32,9 +32,9 @@
 
 ```
 /home/user/gitl/
-├── index.html              # NEW: Modern landing page with featured content
-├── index-old.html          # Previous imageboard-style homepage
-├── index.html.backup       # Backup of old version
+├── index.html              # Main imageboard-style homepage with theme system
+├── index-old.html          # Previous card-based landing page (archived)
+├── index.html.backup       # Backup of earlier version
 ├── claude.html             # "Work wife" AI relationship page
 ├── sinks.html              # Satirical sink thread (imageboard parody)
 ├── world-desserts.html     # Educational desserts gallery
@@ -68,7 +68,6 @@
 - **Pull Request workflow:** Create PRs from feature branches to main
 
 ### Git Remote
-- **Origin:** Uses local proxy at `http://local_proxy@127.0.0.1:43292/git/joejoebonecar/gitl`
 - **Push command:** Always use `git push -u origin <branch-name>`
 - **Retry logic:** Network failures should retry up to 4 times with exponential backoff (2s, 4s, 8s, 16s)
 
@@ -310,16 +309,16 @@ A recurring theme - games include "chaos" or "troll" modes:
 ## Key Files to Understand
 
 ### index.html
-- **NEW landing page** - Modern card-based design
-- Links to featured pages (Sinks, World Desserts)
-- Link to classic imageboard layout
+- **Imageboard-style homepage** - Yotsuba B aesthetic with 18 theme options
+- OP greentext post, physics war declaration, fake reply threads
+- Games dropdown, theme dropdown, wikipedia easter egg links
+- GoatCounter analytics
 - This is the entry point - keep it updated with best content
 
-### index.html.backup (formerly index-old.html)
-- Original imageboard-style homepage
-- Links to all games and pages
-- Maintains classic aesthetic
-- Reference for imageboard styling
+### index-old.html
+- Previous card-based landing page (archived)
+- May be referenced or revived in future
+- Not currently linked or served as default
 
 ### fireworks.js
 - **Only standalone JavaScript file** in project
@@ -423,8 +422,8 @@ Before committing changes to games or pages:
 5. **Blackjack game** (PR #28) - Full card game with AI
 
 ### Project Direction
-- Moving toward featured content approach (new index.html)
-- Maintaining backward compatibility (old layout still accessible)
+- Imageboard aesthetic is the primary identity
+- Site may expand to include additional sections with distinct aesthetics
 - Emphasis on mobile experience
 - Adding more creative/humorous content
 - Games remain imageboard-styled
@@ -504,6 +503,10 @@ This is a personal project by the repository owner. When working as an AI assist
 
 ## Version History
 
+- **2026-03-04** - Updated CLAUDE.md
+  - Fixed stale descriptions (index.html is imageboard, not card layout)
+  - Removed vestigial local proxy URL
+  - Updated project direction to reflect current state
 - **2026-01-24** - Initial CLAUDE.md created
   - Documented current state of project
   - Codified conventions and patterns
