@@ -1,1 +1,1 @@
-Permissions test at 2026-06-26 ~02:31 CDT. If you see this, write access works now.
+Permissions test SUCCESS - reconnected via web. Write access confirmed at 02:33 CDT.
