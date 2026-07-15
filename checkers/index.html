@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>checkers /gitl/ - Mandatory Captures Edition</title>
+  <style>
+    body { margin: 0; padding: 0; background: #1a1a2e; color: #eee; font-family: 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .header { width: 100%; max-width: 800px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #16213e; border-bottom: 3px solid #0f3460; }
+    .header h1 { margin: 0; font-size: 1.8rem; color: #ff71ce; }
+    .header a { color: #01cdfe; text-decoration: none; font-size: 0.9rem; }
+    .header a:hover { color: #ff71ce; }
+    .game-container { max-width: 800px; width: 100%; padding: 20px; }
+    #status { background: #0f3460; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; }
+    .turn-indicator { display: flex; align-items: center; gap: 10px; }
+    .piece-preview { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; }
+    .piece-preview.red { background: #e53935; }
+    .piece-preview.black { background: #333; }
+    #board { 
+      display: grid; 
+      grid-template-columns: repeat(8, 1fr); 
+      width: 100%; 
+      max-width: 560px; 
+      margin: 0 auto; 
+      border: 8px solid #5d4037; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 20px rgba(0,0,0,0.3);
+      background: #5d4037;
+    }
+    .square { 
+      aspect-ratio: 1 / 1; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      position: relative; 
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .square.light { background: #f0d9b5; }
+    .square.dark { background: #b58863; }
+    .square.selected { box-shadow: inset 0 0 0 4px #ffeb3b; z-index: 2; }
+    .square.valid { background: #81c784 !important; box-shadow: inset 0 0 0 3px #4caf50; }
+    .square.valid:hover { background: #66bb6a !important; }
+    .piece { 
+      width: 78%; 
+      height: 78%; 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 2.2rem; 
+      font-weight: bold; 
+      color: #fff; 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.3), inset 0 4px 4px rgba(255,255,255,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+      user-select: none;
+      pointer-events: none;
+    }
+    .piece.red { background: linear-gradient(145deg, #e53935, #b71c1c); border: 3px solid #7f0000; }
+    .piece.black { background: linear-gradient(145deg, #455a64, #263238); border: 3px solid #1a1a1a; }
+    .piece.king { border-color: #ffd700; box-shadow: 0 0 12px #ffd700, 0 4px 8px rgba(0,0,0,0.4); }
+    .piece.king::after { content: '♔'; position: absolute; font-size: 1.1rem; color: #ffd700; text-shadow: 0 0 4px #000; }
+    .captured { display: flex; gap: 8px; margin-top: 15px; }
+    .captured .piece { width: 32px; height: 32px; font-size: 1.2rem; pointer-events: auto; }
+    .controls { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    button { background: #0f3460; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: all 0.2s; }
+    button:hover { background: #1a5276; transform: translateY(-1px); }
+    button:active { transform: scale(0.98); }
+    .message { min-height: 28px; margin: 10px 0; font-size: 1.1rem; color: #ffeb3b; text-align: center; }
+    .rules { max-width: 560px; margin: 20px auto; background: #16213e; padding: 15px; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; }
+    .rules h3 { margin-top: 0; color: #ff71ce; }
+    @media (max-width: 600px) { #board { max-width: 100%; } .piece { font-size: 1.8rem; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>♟️ checkers</h1>
+    <div>
+      <a href="../index.html">← back to /gitl/</a>
+    </div>
+  </div>
+
+  <div class="game-container">
+    <div id="status">
+      <div class="turn-indicator">
+        <span id="turn-text">Red's turn</span>
+        <div id="turn-piece" class="piece-preview red"></div>
+      </div>
+      <div>
+        <span id="captured-text">Captured — Red: 0 | Black: 0</span>
+      </div>
+    </div>
+
+    <div id="board"></div>
+
+    <div class="message" id="message"></div>
+
+    <div class="captured">
+      <div id="captured-red"></div>
+      <div id="captured-black"></div>
+    </div>
+
+    <div class="controls">
+      <button onclick="newGame()">New Game</button>
+      <button onclick="undo()">Undo</button>
+      <button onclick="aiMove()">AI Move</button>
+      <button onclick="showRules()">Rules</button>
+    </div>
+
+    <div class="rules" id="rules" style="display:none;">
+      <h3>Standard American Checkers Rules</h3>
+      <ul style="margin: 8px 0; padding-left: 20px;">
+        <li>Play on dark squares only.</li>
+        <li>Regular pieces move diagonally forward one square.</li>
+        <li>Captures are <b>mandatory</b>. Jump over adjacent opponent piece to empty square beyond.</li>
+        <li>Multiple jumps (chains) are allowed and must be continued if possible.</li>
+        <li>Reach the opposite end to promote to King. Kings move and capture in any diagonal direction.</li>
+        <li>Win by capturing all opponent pieces or leaving them with no legal moves.</li>
+      </ul>
+      <p style="font-size:0.85rem; opacity:0.8; margin:8px 0 0;">This implementation enforces mandatory captures and multi-jump chains. AI is random but prefers captures.</p>
+    </div>
+  </div>
+
+  <script>
+    // Fully functional Checkers implementation
+    let board = [];
+    let currentPlayer = 'red';
+    let selected = null;
+    let validMoves = [];
+    let history = [];
+    let captured = { red: 0, black: 0 };
+    let jumpInProgress = false;
+
+    const BOARD_SIZE = 8;
+
+    function inBounds(r, c) {
+      return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
+    }
+
+    function isDarkSquare(r, c) {
+      return (r + c) % 2 === 1;
+    }
+
+    function initBoard() {
+      board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
+      // Black pieces (top, rows 0-2)
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (isDarkSquare(r, c)) {
+            board[r][c] = { color: 'black', king: false };
+          }
+        }
+      }
+      // Red pieces (bottom, rows 5-7)
+      for (let r = 5; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (isDarkSquare(r, c)) {
+            board[r][c] = { color: 'red', king: false };
+          }
+        }
+      }
+      currentPlayer = 'red';
+      selected = null;
+      validMoves = [];
+      history = [];
+      captured = { red: 0, black: 0 };
+      jumpInProgress = false;
+      document.getElementById('message').textContent = '';
+    }
+
+    function saveState() {
+      const state = {
+        board: JSON.parse(JSON.stringify(board)),
+        currentPlayer,
+        captured: { ...captured },
+        jumpInProgress
+      };
+      history.push(state);
+      if (history.length > 20) history.shift(); // limit undo stack
+    }
+
+    function undo() {
+      if (history.length === 0) return;
+      const prev = history.pop();
+      board = prev.board;
+      currentPlayer = prev.currentPlayer;
+      captured = prev.captured;
+      jumpInProgress = prev.jumpInProgress;
+      selected = null;
+      validMoves = [];
+      renderBoard();
+      updateStatus();
+      document.getElementById('message').textContent = 'Undo performed';
+    }
+
+    function renderBoard() {
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      boardEl.style.gridTemplateColumns = 'repeat(8, minmax(0, 1fr))';
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const square = document.createElement('div');
+          square.className = `square ${isDarkSquare(r, c) ? 'dark' : 'light'}`;
+          square.dataset.r = r;
+          square.dataset.c = c;
+          
+          if (!isDarkSquare(r, c)) {
+            square.style.cursor = 'default';
+          } else {
+            square.onclick = () => handleClick(r, c);
+          }
+
+          const pieceData = board[r][c];
+          if (pieceData) {
+            const piece = document.createElement('div');
+            piece.className = `piece ${pieceData.color} ${pieceData.king ? 'king' : ''}`;
+            if (pieceData.king) {
+              piece.innerHTML = '♔';
+            }
+            square.appendChild(piece);
+          }
+
+          // Highlights
+          if (selected && selected.r === r && selected.c === c) {
+            square.classList.add('selected');
+          }
+          if (validMoves.some(m => m.r === r && m.c === c)) {
+            square.classList.add('valid');
+          }
+
+          boardEl.appendChild(square);
+        }
+      }
+    }
+
+    function updateStatus() {
+      const turnText = document.getElementById('turn-text');
+      const turnPiece = document.getElementById('turn-piece');
+      const capText = document.getElementById('captured-text');
+
+      turnText.textContent = currentPlayer === 'red' ? "Red's turn" : "Black's turn";
+      turnPiece.className = `piece-preview ${currentPlayer}`;
+
+      capText.textContent = `Captured — Red: ${captured.red} | Black: ${captured.black}`;
+    }
+
+    function hasAnyCapture(player) {
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const p = board[r][c];
+          if (p && p.color === player) {
+            if (getJumpsForPiece(r, c).length > 0) return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function getJumpsForPiece(r, c) {
+      const p = board[r][c];
+      if (!p) return [];
+      const jumps = [];
+      const dirs = p.king 
+        ? [[-1,-1], [-1,1], [1,-1], [1,1]] 
+        : (p.color === 'red' ? [[1,-1], [1,1]] : [[-1,-1], [-1,1]]);
+
+      for (const [dr, dc] of dirs) {
+        const mr = r + dr, mc = c + dc;
+        const tr = r + dr * 2, tc = c + dc * 2;
+        if (inBounds(mr, mc) && inBounds(tr, tc) &&
+            board[mr][mc] && board[mr][mc].color !== p.color && !board[tr][tc]) {
+          jumps.push({ r: tr, c: tc, capturedR: mr, capturedC: mc });
+        }
+      }
+      return jumps;
+    }
+
+    function getSimpleMovesForPiece(r, c) {
+      const p = board[r][c];
+      if (!p) return [];
+      const moves = [];
+      const dirs = p.king 
+        ? [[-1,-1], [-1,1], [1,-1], [1,1]] 
+        : (p.color === 'red' ? [[1,-1], [1,1]] : [[-1,-1], [-1,1]]);
+
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr, nc = c + dc;
+        if (inBounds(nr, nc) && !board[nr][nc]) {
+          moves.push({ r: nr, c: nc });
+        }
+      }
+      return moves;
+    }
+
+    function getValidMovesForPiece(r, c) {
+      const jumps = getJumpsForPiece(r, c);
+      if (jumps.length > 0) return jumps.map(j => ({ r: j.r, c: j.c, jump: true, capturedR: j.capturedR, capturedC: j.capturedC }));
+      
+      if (!hasAnyCapture(currentPlayer)) {
+        return getSimpleMovesForPiece(r, c).map(m => ({ r: m.r, c: m.c, jump: false }));
+      }
+      return [];
+    }
+
+    function selectPiece(r, c) {
+      const p = board[r][c];
+      if (!p || p.color !== currentPlayer) return;
+
+      selected = { r, c };
+      validMoves = getValidMovesForPiece(r, c);
+      renderBoard();
+    }
+
+    function clearSelection() {
+      selected = null;
+      validMoves = [];
+      renderBoard();
+    }
+
+    function handleClick(r, c) {
+      if (!isDarkSquare(r, c)) return;
+
+      const pieceHere = board[r][c];
+
+      if (selected) {
+        // Check if clicking a valid destination
+        const dest = validMoves.find(m => m.r === r && m.c === c);
+        if (dest) {
+          makeMove(selected.r, selected.c, r, c, dest);
+          return;
+        }
+        // Clicked another of own pieces
+        if (pieceHere && pieceHere.color === currentPlayer) {
+          selectPiece(r, c);
+          return;
+        }
+        // Invalid click, clear
+        clearSelection();
+        return;
+      }
+
+      // No selection yet - select if own piece
+      if (pieceHere && pieceHere.color === currentPlayer) {
+        selectPiece(r, c);
+      }
+    }
+
+    function makeMove(fromR, fromC, toR, toC, moveData) {
+      saveState();
+
+      const piece = board[fromR][fromC];
+      board[toR][toC] = piece;
+      board[fromR][fromC] = null;
+
+      let didCapture = false;
+      let capturedPos = null;
+
+      if (moveData && moveData.jump) {
+        board[moveData.capturedR][moveData.capturedC] = null;
+        didCapture = true;
+        capturedPos = { r: moveData.capturedR, c: moveData.capturedC };
+        captured[piece.color === 'red' ? 'black' : 'red']++;
+      }
+
+      // Promotion
+      if (!piece.king) {
+        if ((piece.color === 'red' && toR === 7) || (piece.color === 'black' && toR === 0)) {
+          piece.king = true;
+        }
+      }
+
+      // Check for further jumps (chain)
+      if (didCapture) {
+        const furtherJumps = getJumpsForPiece(toR, toC);
+        if (furtherJumps.length > 0) {
+          // Continue chain - keep same player, select new position
+          jumpInProgress = true;
+          selected = { r: toR, c: toC };
+          validMoves = furtherJumps.map(j => ({ r: j.r, c: j.c, jump: true, capturedR: j.capturedR, capturedC: j.capturedC }));
+          renderBoard();
+          updateStatus();
+          document.getElementById('message').textContent = 'Chain jump! Continue...';
+          return;
+        }
+      }
+
+      // End of turn or chain
+      jumpInProgress = false;
+      clearSelection();
+      currentPlayer = currentPlayer === 'red' ? 'black' : 'red';
+
+      // Check for win
+      const winner = checkWin();
+      if (winner) {
+        document.getElementById('message').innerHTML = `<b>${winner.toUpperCase()} WINS!</b> 🎉`;
+        // disable further play by clearing selection
+        selected = null;
+        validMoves = [];
+      } else {
+        document.getElementById('message').textContent = '';
+      }
+
+      renderBoard();
+      updateStatus();
+    }
+
+    function checkWin() {
+      // Check if current player has any moves
+      let hasMove = false;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const p = board[r][c];
+          if (p && p.color === currentPlayer) {
+            if (getValidMovesForPiece(r, c).length > 0) {
+              hasMove = true;
+              break;
+            }
+          }
+        }
+        if (hasMove) break;
+      }
+      if (!hasMove) {
+        return currentPlayer === 'red' ? 'black' : 'red';
+      }
+      // Also check piece count (optional, covered by no moves)
+      return null;
+    }
+
+    function getAllValidActions(player) {
+      const actions = [];
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const p = board[r][c];
+          if (p && p.color === player) {
+            const moves = getValidMovesForPiece(r, c);
+            for (const m of moves) {
+              actions.push({ fromR: r, fromC: c, toR: m.r, toC: m.c, moveData: m });
+            }
+          }
+        }
+      }
+      return actions;
+    }
+
+    function aiMove() {
+      if (jumpInProgress) {
+        document.getElementById('message').textContent = 'Finish the chain jump first!';
+        return;
+      }
+      const actions = getAllValidActions(currentPlayer);
+      if (actions.length === 0) {
+        document.getElementById('message').textContent = 'No moves left for AI';
+        return;
+      }
+
+      // Prefer captures
+      const captures = actions.filter(a => a.moveData.jump);
+      const choice = captures.length > 0 
+        ? captures[Math.floor(Math.random() * captures.length)]
+        : actions[Math.floor(Math.random() * actions.length)];
+
+      // Execute directly
+      makeMove(choice.fromR, choice.fromC, choice.toR, choice.toC, choice.moveData);
+    }
+
+    function newGame() {
+      initBoard();
+      renderBoard();
+      updateStatus();
+      document.getElementById('message').textContent = 'Red starts. Click a piece to begin.';
+      // initial save? optional
+    }
+
+    function showRules() {
+      const rulesEl = document.getElementById('rules');
+      rulesEl.style.display = rulesEl.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Keyboard support (optional)
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'r' && document.activeElement.tagName === 'BODY') {
+        newGame();
+      }
+      if (e.key.toLowerCase() === 'u') {
+        undo();
+      }
+    });
+
+    // Boot the game
+    function boot() {
+      initBoard();
+      renderBoard();
+      updateStatus();
+      document.getElementById('message').textContent = 'Red to move. Captures are mandatory. Have fun! 🍄';
+      // Easter egg: click title for psychedelic flash
+      const title = document.querySelector('.header h1');
+      if (title) {
+        title.style.cursor = 'pointer';
+        title.onclick = () => {
+          document.body.style.transition = 'filter 0.4s';
+          document.body.style.filter = 'hue-rotate(180deg) saturate(1.8)';
+          setTimeout(() => {
+            document.body.style.filter = 'none';
+          }, 420);
+        };
+      }
+    }
+
+    window.onload = boot;
+  </script>
+</body>
+</html>
