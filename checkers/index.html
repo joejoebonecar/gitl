@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f3460">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Checkers">
   <title>checkers /gitl/ - Mandatory Captures Edition</title>
   <style>
     body { margin: 0; padding: 0; background: #1a1a2e; color: #eee; font-family: 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -491,7 +496,7 @@
       initBoard();
       renderBoard();
       updateStatus();
-      document.getElementById('message').textContent = 'Red to move. Captures are mandatory. Have fun! 🍄';
+      document.getElementById('message').textContent = 'Red to move. Captures are mandatory. Install as PWA for offline play! 🍄';
       // Easter egg: click title for psychedelic flash
       const title = document.querySelector('.header h1');
       if (title) {
@@ -507,6 +512,30 @@
     }
 
     window.onload = boot;
+  </script>
+
+  <script>
+    // PWA Service Worker registration + basic install prompt handling
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(registration => {
+            console.log('✅ ServiceWorker registered for offline play');
+          })
+          .catch(error => {
+            console.log('ServiceWorker registration failed:', error);
+          });
+      });
+    }
+
+    // Optional: Show install prompt button (appears after criteria met)
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // You could show a custom install button here if desired
+      console.log('PWA install prompt available');
+    });
   </script>
 </body>
 </html>
